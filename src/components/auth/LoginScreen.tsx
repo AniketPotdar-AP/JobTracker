@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuthStore } from "@/store/useAuth";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function LoginScreen() {
   const signIn = useAuthStore((s) => s.signIn);
@@ -19,8 +19,18 @@ export function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(e?: React.SyntheticEvent) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (busy) return;
+
+    if (!email.trim() || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
     setBusy(true);
     setError(null);
     try {
@@ -44,6 +54,8 @@ export function LoginScreen() {
           toast.success("Account created");
         }
       }
+    } catch (err: any) {
+      setError(err?.message ?? "An unexpected error occurred.");
     } finally {
       setBusy(false);
     }
@@ -66,43 +78,75 @@ export function LoginScreen() {
             <CardDescription>Your applications are private to your account.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={mode} onValueChange={(v) => { setMode(v as "signin" | "signup"); setError(null); }}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign in</TabsTrigger>
-                <TabsTrigger value="signup">Sign up</TabsTrigger>
-              </TabsList>
+            {/* Mode Switcher */}
+            <div className="grid w-full grid-cols-2 rounded-lg bg-muted p-1 text-muted-foreground mb-4">
+              <button
+                type="button"
+                onClick={() => { setMode("signin"); setError(null); }}
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all",
+                  mode === "signin" ? "bg-background text-foreground shadow-sm" : "hover:bg-background/50 hover:text-foreground"
+                )}
+              >
+                Sign in
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMode("signup"); setError(null); }}
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all",
+                  mode === "signup" ? "bg-background text-foreground shadow-sm" : "hover:bg-background/50 hover:text-foreground"
+                )}
+              >
+                Sign up
+              </button>
+            </div>
 
-              <TabsContent value={mode} className="mt-4">
-                <form onSubmit={submit} className="space-y-4">
-                  {mode === "signup" && (
-                    <div className="space-y-1.5">
-                      <Label htmlFor="name">Full name</Label>
-                      <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Aniket" />
-                    </div>
-                  )}
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email" type="email" autoComplete="username" required
-                      value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password" type="password" required minLength={6}
-                      autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                      value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
-                    />
-                  </div>
-                  {error && <p className="text-sm text-destructive">{error}</p>}
-                  <Button type="submit" className="w-full" disabled={busy}>
-                    {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {mode === "signin" ? "Sign in" : "Create account"}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+            <div className="space-y-4">
+              {mode === "signup" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="name">Full name</Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Aniket"
+                    onKeyDown={(e) => { if (e.key === "Enter") void submit(e); }}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email" type="email" autoComplete="username" required
+                  value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
+                  onKeyDown={(e) => { if (e.key === "Enter") void submit(e); }}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password" type="password" required minLength={6}
+                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
+                  onKeyDown={(e) => { if (e.key === "Enter") void submit(e); }}
+                />
+              </div>
+
+              {error && <p className="text-sm text-destructive font-medium">{error}</p>}
+
+              <Button
+                type="button"
+                onClick={(e) => void submit(e)}
+                className="w-full"
+                disabled={busy}
+              >
+                {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {mode === "signin" ? "Sign in" : "Create account"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

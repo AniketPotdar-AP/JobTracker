@@ -168,22 +168,26 @@ export const useApplicationsStore = create<State>()((set, get) => {
   const refresh = async () => {
     const userId = get().userId;
     if (!userId) return;
-    const { data, error } = await table()
-      .select("*")
-      .order("applied_date", { ascending: false });
-    if (error) {
-      fail(error, "Could not load your applications.");
-      return;
+    try {
+      const { data, error } = await table()
+        .select("*")
+        .order("applied_date", { ascending: false });
+      if (error) {
+        console.error("Could not load applications from Supabase:", error);
+        return;
+      }
+      const apps = ((data as unknown as Row[]) ?? []).map(fromRow);
+      writeLocal(`jat.apps.${userId}`, apps);
+      set({ applications: apps });
+    } catch (e) {
+      console.error("Failed to refresh applications:", e);
     }
-    const apps = ((data as unknown as Row[]) ?? []).map(fromRow);
-    writeLocal(`jat.apps.${userId}`, apps);
-    set({ applications: apps });
   };
 
   return {
     applications: [],
     theme: "light",
-    hasHydrated: false,
+    hasHydrated: true,
     loading: false,
     userId: null,
 
@@ -193,12 +197,15 @@ export const useApplicationsStore = create<State>()((set, get) => {
       if (cached && Array.isArray(cached)) {
         set({ userId, applications: cached, hasHydrated: true, loading: false });
       } else {
-        set({ userId, loading: true });
+        set({ userId, loading: true, hasHydrated: true });
       }
-      await refresh();
-      set({ loading: false, hasHydrated: true });
+      try {
+        await refresh();
+      } finally {
+        set({ loading: false, hasHydrated: true });
+      }
     },
-    unloadUser: () => set({ userId: null, applications: [], hasHydrated: false }),
+    unloadUser: () => set({ userId: null, applications: [], hasHydrated: true }),
 
     hydrateTheme: () => {
       const theme = readLocal<"light" | "dark">(storageKeys.theme) ?? "light";

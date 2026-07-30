@@ -4,14 +4,9 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  HeadContent,
-  Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 
-import { Loader2 } from "lucide-react";
-
-import appCss from "../styles.css?url";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { Toaster } from "@/components/ui/sonner";
@@ -57,10 +52,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             onClick={() => { router.invalidate(); reset(); }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >Try again</button>
-          <a
-            href="/"
+          <Link
+            to="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
-          >Go home</a>
+          >Go home</Link>
         </div>
       </div>
     </div>
@@ -68,85 +63,58 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "JobTrack — Job Application Tracker" },
-      { name: "description", content: "Track and organize all your job applications in one clean, minimal workspace." },
-      { property: "og:title", content: "JobTrack — Job Application Tracker" },
-      { property: "og:description", content: "Track and organize all your job applications in one clean, minimal workspace." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-    ],
-  }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: ReactNode }) {
-  if (typeof window !== "undefined") {
-    return <>{children}</>;
-  }
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
 function AppShell() {
-  const hydrated = useApplicationsStore((s) => s.hasHydrated);
   const user = useAuthStore((s) => s.user);
   const userId = user?.id;
-  const authHydrated = useAuthStore((s) => s.hydrated);
+  const loadedUserId = useRef<string | null>(null);
 
-  // Boot: clean legacy local data, restore theme, subscribe to the cloud session.
+  // Boot: restore theme, subscribe to the cloud session.
   useEffect(() => {
     purgeLegacyData();
     useApplicationsStore.getState().hydrateTheme();
 
     const { setSession, setHydrated } = useAuthStore.getState();
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setHydrated(true);
-    });
+    let mounted = true;
+
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!mounted) return;
+        setSession(data?.session ?? null);
+        setHydrated(true);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setHydrated(true);
+      });
+
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setHydrated(true);
     });
-    return () => sub.subscription.unsubscribe();
+
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
-  // Load / unload the signed-in user's cloud data.
+  // Load / unload the signed-in user's cloud data — only when userId genuinely changes.
   useEffect(() => {
-    if (!authHydrated) return;
-    if (userId) void useApplicationsStore.getState().loadUser(userId);
-    else useApplicationsStore.getState().unloadUser();
-  }, [authHydrated, userId]);
-
-  if (!authHydrated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    );
-  }
+    if (userId) {
+      if (loadedUserId.current === userId) return; // already loaded for this user
+      loadedUserId.current = userId;
+      void useApplicationsStore.getState().loadUser(userId);
+    } else {
+      loadedUserId.current = null;
+      useApplicationsStore.getState().unloadUser();
+    }
+  }, [userId]);
 
 
   if (!user) {
@@ -163,7 +131,7 @@ function AppShell() {
       <Sidebar />
       <main className="flex-1 min-w-0 pb-20 md:pb-0">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {hydrated ? <Outlet /> : null}
+          <Outlet />
         </div>
       </main>
       <MobileNav />

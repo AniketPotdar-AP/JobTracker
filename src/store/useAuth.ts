@@ -32,29 +32,57 @@ function toUser(session: Session | null): SessionUser | null {
 export const useAuthStore = create<AuthState>()((set) => ({
   user: null,
   hydrated: false,
-  setSession: (session) => set({ user: toUser(session) }),
+  setSession: (session) => {
+    const newUser = toUser(session);
+    // Only update state if the user ID actually changed — prevents infinite re-render
+    // loops from onAuthStateChange firing on tab focus / token refresh.
+    set((prev) => {
+      if (prev.user?.id === newUser?.id) return prev;
+      return { user: newUser };
+    });
+  },
   setHydrated: (v) => set({ hydrated: v }),
 
   signIn: async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
-    });
-    if (error) return { ok: false as const, error: error.message };
-    return { ok: true as const };
+    try {
+      const timeoutPromise = new Promise<{ error: { message: string } }>((_, reject) =>
+        setTimeout(() => reject(new Error("Sign in timed out. Please check your network and try again.")), 8000)
+      );
+      const res = await Promise.race([
+        supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
+        timeoutPromise,
+      ]);
+      if (res.error) return { ok: false as const, error: res.error.message };
+      return { ok: true as const };
+    } catch (e: any) {
+      return { ok: false as const, error: e?.message ?? "Network error during sign in." };
+    }
   },
 
   signUp: async (email, password, name) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim().toLowerCase(),
-      password,
-      options: {
-        emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
-        data: { full_name: name.trim() || email.split("@")[0] },
-      },
-    });
-    if (error) return { ok: false as const, error: error.message };
-    return { ok: true as const, needsConfirmation: !data.session };
+    try {
+      const timeoutPromise = new Promise<{ data: any; error: { message: string } }>((_, reject) =>
+        setTimeout(() => reject(new Error("Sign up timed out. Please check your network and try again.")), 8000)
+      );
+      const res = await Promise.race([
+        supabase.auth.signUp({
+          email: email.trim().toLowerCase(),
+          password,
+          options: {
+            emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+            data: { full_name: name.trim() || email.split("@")[0] },
+          },
+        }),
+        timeoutPromise,
+      ]);
+      if (res.error) return { ok: false as const, error: res.error.message };
+      return { ok: true as const, needsConfirmation: !res.data?.session };
+    } catch (e: any) {
+      return { ok: false as const, error: e?.message ?? "Network error during sign up." };
+    }
   },
 
   signOut: async () => {
