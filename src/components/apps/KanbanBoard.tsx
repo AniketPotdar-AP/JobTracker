@@ -326,7 +326,7 @@ function Column({
         </div>
       </div>
 
-      <div className="flex-1 space-y-2 p-2 min-h-[100px]">
+      <div className="flex-1 space-y-2 p-2 min-h-25">
         {items.map((a) => (
           <DraggableCard
             key={a.id}

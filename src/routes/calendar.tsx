@@ -194,7 +194,7 @@ function CalendarPage() {
       />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] min-h-[calc(100vh-13rem)]">
-        <Card className="flex flex-col h-full min-h-[600px]">
+        <Card className="flex flex-col h-full min-h-150">
           <CardContent className="p-4 flex flex-col flex-1 h-full">
             <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2 shrink-0">
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <div key={d} className="py-1">{d}</div>)}
@@ -236,7 +236,7 @@ function CalendarPage() {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col h-full min-h-[600px]">
+        <Card className="flex flex-col h-full min-h-150">
           <CardContent className="p-4 flex flex-col flex-1">
             <div className="text-sm font-semibold border-b pb-3 shrink-0">
               {selected ? format(selected, "EEEE, MMM d, yyyy") : "Select a day"}
