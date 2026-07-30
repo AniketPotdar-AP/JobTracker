@@ -110,6 +110,7 @@ function RootShell({ children }: { children: ReactNode }) {
 function AppShell() {
   const hydrated = useApplicationsStore((s) => s.hasHydrated);
   const user = useAuthStore((s) => s.user);
+  const userId = user?.id;
   const authHydrated = useAuthStore((s) => s.hydrated);
 
   // Boot: clean legacy local data, restore theme, subscribe to the cloud session.
@@ -132,9 +133,9 @@ function AppShell() {
   // Load / unload the signed-in user's cloud data.
   useEffect(() => {
     if (!authHydrated) return;
-    if (user) void useApplicationsStore.getState().loadUser(user.id);
+    if (userId) void useApplicationsStore.getState().loadUser(userId);
     else useApplicationsStore.getState().unloadUser();
-  }, [authHydrated, user]);
+  }, [authHydrated, userId]);
 
   if (!authHydrated) {
     return (
