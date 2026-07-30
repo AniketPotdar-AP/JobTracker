@@ -9,12 +9,14 @@ A modern, clean, and responsive job application tracker built as a premium singl
 ## ✨ Features
 
 ### Dashboard
+
 - KPI cards: **Total**, **Applied**, **In Progress**, **Interview**, **Offer**, **Rejected**
 - **Applications by month** bar chart (last 6 months)
 - **Status distribution** donut chart
 - **Recent applications**, **Upcoming interviews**, and a live **Activity feed**
 
 ### Applications
+
 - Rich CRUD for every application (company, role, location, work mode, source, recruiter, salary, resume, links, notes, priority)
 - Toggle between **Table view** and **Kanban board**
 - **Drag-and-drop** status changes on the Kanban (`@dnd-kit`)
@@ -22,21 +24,25 @@ A modern, clean, and responsive job application tracker built as a premium singl
 - Per-application detail page with tabs: **Timeline · Interviews · Status history · Notes**
 
 ### Calendar
+
 - Monthly grid showing interview dates and follow-ups
 - Click a day to jump straight to the application
 
 ### Analytics
+
 - Conversion funnel (Applied → Interview → Offer)
 - Response rate, interview rate, offer rate
 - Source performance and time-to-response insights
 
 ### Settings
+
 - **Light / Dark theme** toggle (persists across reloads)
 - **Export** all data as JSON
 - **Import** JSON to restore a backup
 - **Clear all** with confirmation
 
 ### UX polish
+
 - Fully responsive: desktop, tablet, and mobile (bottom nav on small screens)
 - Beautiful empty states
 - Confirmation dialogs before deletion
@@ -50,13 +56,13 @@ A modern, clean, and responsive job application tracker built as a premium singl
 
 Minimal light SaaS aesthetic inspired by Linear and Notion, with a matching premium dark mode.
 
-| Token       | Light                        | Dark                            |
-| ----------- | ---------------------------- | ------------------------------- |
-| Background  | `#ffffff`                    | `oklch(0.16 0.02 260)`          |
-| Primary     | `#3b82f6` (blue-500)         | `oklch(0.7 0.16 256)`           |
-| Success     | `#10b981` (emerald-500)      | same                            |
-| Destructive | `#ef4444` (red-500)          | same                            |
-| Font        | Inter, tabular-nums for KPIs | same                            |
+| Token       | Light                        | Dark                   |
+| ----------- | ---------------------------- | ---------------------- |
+| Background  | `#ffffff`                    | `oklch(0.16 0.02 260)` |
+| Primary     | `#3b82f6` (blue-500)         | `oklch(0.7 0.16 256)`  |
+| Success     | `#10b981` (emerald-500)      | same                   |
+| Destructive | `#ef4444` (red-500)          | same                   |
+| Font        | Inter, tabular-nums for KPIs | same                   |
 
 All colors are semantic CSS variables — components never hardcode hex values, so theme swaps are instant.
 
@@ -81,6 +87,7 @@ All colors are semantic CSS variables — components never hardcode hex values, 
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - [Bun](https://bun.sh) ≥ 1.1 (or Node.js ≥ 20 with npm/pnpm)
 
 ### Install & run
@@ -138,20 +145,26 @@ type Application = {
   id: string;
   company: string;
   title: string;
-  status: Status;               // wishlist → joined (10 states)
+  status: Status; // wishlist → joined (10 states)
   priority: "low" | "medium" | "high";
   workMode: "remote" | "hybrid" | "onsite";
   appliedDate: string;
   source: string;
   location?: string;
   salary?: string;
-  recruiterName?: string; recruiterEmail?: string;
-  jobUrl?: string; portfolioUrl?: string; githubUrl?: string; linkedinUrl?: string;
+  recruiterName?: string;
+  recruiterEmail?: string;
+  jobUrl?: string;
+  portfolioUrl?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
   resumeUsed?: string;
-  interviewDate?: string; followUpDate?: string;
+  interviewDate?: string;
+  followUpDate?: string;
   notes?: string;
   archived: boolean;
-  createdAt: string; updatedAt: string;
+  createdAt: string;
+  updatedAt: string;
   statusHistory: { status: Status; at: string }[];
   interviews: Interview[];
   activity: ActivityEntry[];
@@ -159,6 +172,7 @@ type Application = {
 ```
 
 ### Statuses
+
 `wishlist` · `ready_to_apply` · `applied` · `recruiter_call` · `assessment` · `technical_interview` · `hr_interview` · `final_interview` · `offer` · `joined` · `rejected` · `ghosted`
 
 ---
@@ -179,7 +193,7 @@ Toggle from **Settings → Appearance**. The choice persists across reloads and 
 
 ## 🛣 Roadmap
 
-- [ ] Cloud sync (optional, opt-in) via Lovable Cloud
+- [ ] Cloud sync (optional, opt-in)
 - [ ] Email/desktop reminders for follow-ups and interviews
 - [ ] Resume file uploads
 - [ ] CSV import
