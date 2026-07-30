@@ -101,18 +101,32 @@ function AnalyticsPage() {
 
         <Card>
           <CardHeader><CardTitle className="text-base">Status distribution</CardTitle></CardHeader>
-          <CardContent className="h-72">
+          <CardContent>
             {statusData.length === 0 ? (
               <p className="text-sm text-muted-foreground">No data yet</p>
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie isAnimationActive={false} data={statusData} innerRadius={55} outerRadius={95} paddingAngle={2} dataKey="value">
-                    {statusData.map((d, i) => <Cell key={i} fill={d.color} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }} />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="flex flex-col gap-3">
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie isAnimationActive={false} data={statusData} innerRadius={45} outerRadius={75} paddingAngle={2} dataKey="value">
+                        {statusData.map((d, i) => <Cell key={i} fill={d.color} />)}
+                      </Pie>
+                      <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                {/* Status names and values visible from start without hovering */}
+                <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs border-t border-border/50 pt-2.5">
+                  {statusData.map((d) => (
+                    <div key={d.name} className="flex items-center gap-1.5 font-medium">
+                      <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                      <span className="text-muted-foreground">{d.name}:</span>
+                      <span className="font-semibold tabular-nums text-foreground">{d.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>

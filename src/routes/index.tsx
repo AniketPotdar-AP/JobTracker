@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Briefcase, CheckCircle2, Clock, Trophy, XCircle, Loader2 } from "lucide-react";
+import { Plus, Briefcase, CheckCircle2, Clock, Trophy, XCircle, Loader2, Eye } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -124,20 +124,39 @@ function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-base">Status distribution</CardTitle>
           </CardHeader>
-          <CardContent className="h-64">
+          <CardContent>
             {statusData.length === 0 ? (
               <p className="text-sm text-muted-foreground">No data yet</p>
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie isAnimationActive={false} data={statusData} innerRadius={45} outerRadius={80} paddingAngle={2} dataKey="value">
-                    {statusData.map((d, i) => <Cell key={i} fill={d.color} />)}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="flex flex-col gap-3">
+                <div className="h-44">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        isAnimationActive={false}
+                        data={statusData}
+                        innerRadius={35}
+                        outerRadius={65}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {statusData.map((d, i) => <Cell key={i} fill={d.color} />)}
+                      </Pie>
+                      <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                {/* Status names and values visible from start without hovering */}
+                <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs border-t border-border/50 pt-2.5">
+                  {statusData.map((d) => (
+                    <div key={d.name} className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                      <span className="text-muted-foreground">{d.name}:</span>
+                      <span className="font-semibold tabular-nums text-foreground">{d.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -152,21 +171,24 @@ function DashboardPage() {
           <CardContent className="space-y-2">
             {recent.length === 0 && <p className="text-sm text-muted-foreground">No applications yet.</p>}
             {recent.map((a) => (
-              <Link
+              <div
                 key={a.id}
-                to="/applications/$id"
-                params={{ id: a.id }}
-                className="flex items-center justify-between gap-3 rounded-md px-3 py-2 hover:bg-accent"
+                className="flex items-center justify-between gap-3 rounded-md px-3 py-2 border bg-card/60"
               >
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{a.company}</div>
                   <div className="truncate text-xs text-muted-foreground">{a.title}</div>
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <StatusBadge status={a.status} />
-                  <span className="hidden sm:inline text-xs text-muted-foreground w-24 text-right">{fmtDate(a.appliedDate)}</span>
+                  <span className="hidden sm:inline text-xs text-muted-foreground w-20 text-right">{fmtDate(a.appliedDate)}</span>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" title="View details" asChild>
+                    <Link to="/applications/$id" params={{ id: a.id }}>
+                      <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                    </Link>
+                  </Button>
                 </div>
-              </Link>
+              </div>
             ))}
           </CardContent>
         </Card>
@@ -178,15 +200,20 @@ function DashboardPage() {
           <CardContent className="space-y-2">
             {upcomingInterviews.length === 0 && <p className="text-sm text-muted-foreground">Nothing scheduled.</p>}
             {upcomingInterviews.map((a) => (
-              <Link
+              <div
                 key={a.id}
-                to="/applications/$id"
-                params={{ id: a.id }}
-                className="block rounded-md px-3 py-2 hover:bg-accent"
+                className="flex items-center justify-between gap-2 rounded-md px-3 py-2 border bg-card/60"
               >
-                <div className="text-sm font-medium truncate">{a.company}</div>
-                <div className="text-xs text-muted-foreground">{fmtDate(a.interviewDate, "EEE, MMM d")}</div>
-              </Link>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium truncate">{a.company}</div>
+                  <div className="text-xs text-muted-foreground">{fmtDate(a.interviewDate, "EEE, MMM d")}</div>
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" title="View details" asChild>
+                  <Link to="/applications/$id" params={{ id: a.id }}>
+                    <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </Link>
+                </Button>
+              </div>
             ))}
           </CardContent>
         </Card>

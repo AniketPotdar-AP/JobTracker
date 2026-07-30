@@ -70,14 +70,14 @@ function DetailsPage() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
-          <Select value={app.status} onValueChange={(v) => setPendingStatus(v as Status)}>
+          {/* <Select value={app.status} onValueChange={(v) => setPendingStatus(v as Status)}>
             <SelectTrigger className="w-full sm:w-48 h-10"><SelectValue /></SelectTrigger>
             <SelectContent>
               {STATUS_ORDER.map((s) => <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>)}
             </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm" className="h-10" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /> Edit</Button>
-          <Button variant="ghost" size="icon" className="h-10 w-10 text-destructive" onClick={() => setConfirmDelete(true)} title="Delete">
+          </Select> */}
+          <Button variant="outline" size="sm" className="h-10" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /></Button>
+          <Button variant="outline" size="icon" className="h-10 w-10 text-destructive" onClick={() => setConfirmDelete(true)} title="Delete">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>

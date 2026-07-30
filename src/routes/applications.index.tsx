@@ -5,9 +5,11 @@ import {
   Search,
   LayoutGrid,
   TableIcon,
-  MoreHorizontal,
   Briefcase,
   SlidersHorizontal,
+  Eye,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -40,13 +42,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -59,7 +54,6 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/apps/StatusBadge";
 import { ApplicationForm } from "@/components/apps/ApplicationForm";
-import { KanbanBoard } from "@/components/apps/KanbanBoard";
 import { StatusDateModal } from "@/components/apps/StatusDateModal";
 import {
   useApplicationsStore,
@@ -68,6 +62,7 @@ import {
 import { STATUS_LABEL, STATUS_ORDER, SOURCES, type Status } from "@/lib/status";
 import { fmtDate } from "@/lib/format";
 import { toast } from "sonner";
+import { KanbanBoard } from "@/components/apps/KanbanBoard";
 
 export const Route = createFileRoute("/applications/")({
   head: () => ({
@@ -252,73 +247,49 @@ function ApplicationsPage() {
               {/* Mobile Card View (< sm) */}
               <div className="space-y-2.5 sm:hidden">
                 {filtered.map((a) => (
-                  <Card
-                    key={a.id}
-                    className="p-3.5 flex flex-col gap-2.5 cursor-pointer hover:border-primary/50 transition-colors"
-                    onClick={() =>
-                      navigate({
-                        to: "/applications/$id",
-                        params: { id: a.id },
-                      })
-                    }
-                  >
+                  <Card key={a.id} className="p-3.5 flex flex-col gap-2.5">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <Link
-                          to="/applications/$id"
-                          params={{ id: a.id }}
-                          onClick={(e) => e.stopPropagation()}
-                          className="font-semibold text-base hover:underline block truncate"
-                        >
+                        <span className="font-semibold text-base block truncate">
                           {a.company}
-                        </Link>
+                        </span>
                         <p className="text-xs text-muted-foreground truncate">{a.title}</p>
                       </div>
-                      <div onClick={(e) => e.stopPropagation()} className="shrink-0">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 -mr-1"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openEdit(a)}>
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link
-                                to="/applications/$id"
-                                params={{ id: a.id }}
-                              >
-                                View details
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                void duplicate(a.id);
-                                toast.success("Application duplicated");
-                              }}
-                            >
-                              Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => setPendingDelete(a)}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          title="View details"
+                          asChild
+                        >
+                          <Link to="/applications/$id" params={{ id: a.id }}>
+                            <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          title="Edit"
+                          onClick={() => openEdit(a)}
+                        >
+                          <Pencil className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          title="Delete"
+                          onClick={() => setPendingDelete(a)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground pt-1 border-t border-border/50">
-                      <div onClick={(e) => e.stopPropagation()}>
+                      <div>
                         <Select
                           value={a.status}
                           onValueChange={(val) => {
@@ -359,35 +330,19 @@ function ApplicationsPage() {
                       <TableHead className="hidden lg:table-cell">
                         Applied
                       </TableHead>
-                      <TableHead className="w-10" />
+                      <TableHead className="w-28 text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filtered.map((a) => (
-                      <TableRow
-                        key={a.id}
-                        className="cursor-pointer"
-                        onClick={() =>
-                          navigate({
-                            to: "/applications/$id",
-                            params: { id: a.id },
-                          })
-                        }
-                      >
+                      <TableRow key={a.id}>
                         <TableCell className="font-medium">
-                          <Link
-                            to="/applications/$id"
-                            params={{ id: a.id }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="hover:underline"
-                          >
-                            {a.company}
-                          </Link>
+                          <span>{a.company}</span>
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {a.title}
                         </TableCell>
-                        <TableCell onClick={(e) => e.stopPropagation()}>
+                        <TableCell>
                           <Select
                             value={a.status}
                             onValueChange={(val) => {
@@ -414,46 +369,38 @@ function ApplicationsPage() {
                         <TableCell className="hidden lg:table-cell text-muted-foreground">
                           {fmtDate(a.appliedDate)}
                         </TableCell>
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEdit(a)}>
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  to="/applications/$id"
-                                  params={{ id: a.id }}
-                                >
-                                  View details
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  void duplicate(a.id);
-                                  toast.success("Application duplicated");
-                                }}
-                              >
-                                Duplicate
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onClick={() => setPendingDelete(a)}
-                              >
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <TableCell>
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              title="View details"
+                              asChild
+                            >
+                              <Link to="/applications/$id" params={{ id: a.id }}>
+                                <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              title="Edit"
+                              onClick={() => openEdit(a)}
+                            >
+                              <Pencil className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive hover:text-destructive"
+                              title="Delete"
+                              onClick={() => setPendingDelete(a)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

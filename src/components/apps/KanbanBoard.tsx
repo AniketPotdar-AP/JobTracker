@@ -18,20 +18,11 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { MoreHorizontal, EyeOff, SlidersHorizontal, ArrowLeftRight, GripVertical, ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Eye, Pencil, Trash2, EyeOff, SlidersHorizontal, ArrowLeftRight, GripVertical, ChevronLeft, ChevronRight } from "lucide-react";
 import { STATUS_ORDER, STATUS_LABEL, type Status } from "@/lib/status";
 import { useApplicationsStore, type Application } from "@/store/useApplications";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { fmtDate } from "@/lib/format";
 import { readLocal, writeLocal } from "@/lib/local-store";
@@ -78,6 +69,7 @@ function SortableStatusRow({ status }: { status: Status }) {
 }
 
 import { StatusDateModal } from "@/components/apps/StatusDateModal";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
   const setStatus = useApplicationsStore((s) => s.setStatus);
@@ -347,42 +339,54 @@ function DraggableCard({
   app,
   onEdit,
   onDelete,
-  onDuplicate,
 }: {
   app: Application;
   onEdit: (a: Application) => void;
   onDelete: (a: Application) => void;
   onDuplicate: (id: string) => void;
 }) {
-  const navigate = useNavigate();
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: app.id });
   return (
     <div
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      onClick={() => { if (!isDragging) void navigate({ to: "/applications/$id", params: { id: app.id } }); }}
-      className={cn("touch-none cursor-pointer", isDragging && "opacity-40")}
+      className={cn("touch-none", isDragging && "opacity-40")}
     >
       <KanbanCard
         app={app}
         actions={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onPointerDown={(e) => e.stopPropagation()}>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <MoreHorizontal className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem onClick={() => onEdit(app)}>Edit</DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/applications/$id" params={{ id: app.id }}>View details</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDuplicate(app.id)}>Duplicate</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive" onClick={() => onDelete(app)}>Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-0.5 shrink-0" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              title="View details"
+              asChild
+            >
+              <Link to="/applications/$id" params={{ id: app.id }}>
+                <Eye className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              title="Edit"
+              onClick={() => onEdit(app)}
+            >
+              <Pencil className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-destructive hover:text-destructive"
+              title="Delete"
+              onClick={() => onDelete(app)}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         }
       />
     </div>
