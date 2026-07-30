@@ -210,12 +210,12 @@ function Kpi({
 }) {
   return (
     <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
-          <Icon className={`h-4 w-4 ${accent ?? "text-muted-foreground"}`} />
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex items-center justify-between gap-1">
+          <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">{label}</span>
+          <Icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 ${accent ?? "text-muted-foreground"}`} />
         </div>
-        <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
+        <div className="mt-1.5 text-xl sm:text-2xl font-bold tabular-nums">{value}</div>
       </CardContent>
     </Card>
   );

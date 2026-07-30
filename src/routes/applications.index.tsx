@@ -188,44 +188,46 @@ function ApplicationsPage() {
         value={view}
         onValueChange={(v) => setView(v as "table" | "kanban")}
       >
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 min-w-0 ">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search company, title, location..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pl-8"
+              className="pl-9 h-10 text-base sm:text-sm"
             />
           </div>
 
-          <Button
-            variant="outline"
-            className="gap-1.5 shrink-0"
-            onClick={() => setFiltersOpen(true)}
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            <span className="hidden sm:inline">Filters</span>
-            {activeFilters > 0 && (
-              <Badge
-                variant="secondary"
-                className="ml-0.5 h-5 px-1.5 text-[11px]"
-              >
-                {activeFilters}
-              </Badge>
-            )}
-          </Button>
+          <div className="flex items-center gap-2 justify-between sm:justify-start shrink-0">
+            <Button
+              variant="outline"
+              className="gap-1.5 shrink-0 flex-1 sm:flex-none h-10"
+              onClick={() => setFiltersOpen(true)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              <span>Filters</span>
+              {activeFilters > 0 && (
+                <Badge
+                  variant="secondary"
+                  className="ml-0.5 h-5 px-1.5 text-[11px]"
+                >
+                  {activeFilters}
+                </Badge>
+              )}
+            </Button>
 
-          <TabsList className="shrink-0">
-            <TabsTrigger value="table" className="gap-1">
-              <TableIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">Table</span>
-            </TabsTrigger>
-            <TabsTrigger value="kanban" className="gap-1">
-              <LayoutGrid className="h-4 w-4" />
-              <span className="hidden sm:inline">Kanban</span>
-            </TabsTrigger>
-          </TabsList>
+            <TabsList className="shrink-0 h-10">
+              <TabsTrigger value="table" className="gap-1 px-3">
+                <TableIcon className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">Table</span>
+              </TabsTrigger>
+              <TabsTrigger value="kanban" className="gap-1 px-3">
+                <LayoutGrid className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">Kanban</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
         </div>
 
         <TabsContent value="table" className="mt-4">
@@ -246,84 +248,39 @@ function ApplicationsPage() {
               }
             />
           ) : (
-            <Card className="overflow-hidden p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Company</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Location
-                    </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Source
-                    </TableHead>
-                    <TableHead className="hidden lg:table-cell">
-                      Applied
-                    </TableHead>
-                    <TableHead className="w-10" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((a) => (
-                    <TableRow
-                      key={a.id}
-                      className="cursor-pointer"
-                      onClick={() =>
-                        navigate({
-                          to: "/applications/$id",
-                          params: { id: a.id },
-                        })
-                      }
-                    >
-                      <TableCell className="font-medium">
+            <>
+              {/* Mobile Card View (< sm) */}
+              <div className="space-y-2.5 sm:hidden">
+                {filtered.map((a) => (
+                  <Card
+                    key={a.id}
+                    className="p-3.5 flex flex-col gap-2.5 cursor-pointer hover:border-primary/50 transition-colors"
+                    onClick={() =>
+                      navigate({
+                        to: "/applications/$id",
+                        params: { id: a.id },
+                      })
+                    }
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
                         <Link
                           to="/applications/$id"
                           params={{ id: a.id }}
                           onClick={(e) => e.stopPropagation()}
-                          className="hover:underline"
+                          className="font-semibold text-base hover:underline block truncate"
                         >
                           {a.company}
                         </Link>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {a.title}
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <Select
-                          value={a.status}
-                          onValueChange={(val) => {
-                            if (val !== a.status) {
-                              setPendingStatusChange({
-                                appId: a.id,
-                                companyName: a.company,
-                                targetStatus: val as Status,
-                              });
-                            }
-                          }}
-                        >
-                          <SelectValue>
-                            <StatusBadge status={a.status} />
-                          </SelectValue>
-                        </Select>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-muted-foreground">
-                        {a.location ?? "—"}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-muted-foreground">
-                        {a.source}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell text-muted-foreground">
-                        {fmtDate(a.appliedDate)}
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <p className="text-xs text-muted-foreground truncate">{a.title}</p>
+                      </div>
+                      <div onClick={(e) => e.stopPropagation()} className="shrink-0">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
+                              className="h-8 w-8 -mr-1"
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
@@ -357,12 +314,153 @@ function ApplicationsPage() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </TableCell>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground pt-1 border-t border-border/50">
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Select
+                          value={a.status}
+                          onValueChange={(val) => {
+                            if (val !== a.status) {
+                              setPendingStatusChange({
+                                appId: a.id,
+                                companyName: a.company,
+                                targetStatus: val as Status,
+                              });
+                            }
+                          }}
+                        >
+                          <SelectValue>
+                            <StatusBadge status={a.status} />
+                          </SelectValue>
+                        </Select>
+                      </div>
+                      <span className="text-[11px]">{fmtDate(a.appliedDate)}</span>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Desktop Table View (>= sm) */}
+              <Card className="hidden sm:block overflow-hidden p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Company</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        Location
+                      </TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        Source
+                      </TableHead>
+                      <TableHead className="hidden lg:table-cell">
+                        Applied
+                      </TableHead>
+                      <TableHead className="w-10" />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((a) => (
+                      <TableRow
+                        key={a.id}
+                        className="cursor-pointer"
+                        onClick={() =>
+                          navigate({
+                            to: "/applications/$id",
+                            params: { id: a.id },
+                          })
+                        }
+                      >
+                        <TableCell className="font-medium">
+                          <Link
+                            to="/applications/$id"
+                            params={{ id: a.id }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="hover:underline"
+                          >
+                            {a.company}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {a.title}
+                        </TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <Select
+                            value={a.status}
+                            onValueChange={(val) => {
+                              if (val !== a.status) {
+                                setPendingStatusChange({
+                                  appId: a.id,
+                                  companyName: a.company,
+                                  targetStatus: val as Status,
+                                });
+                              }
+                            }}
+                          >
+                            <SelectValue>
+                              <StatusBadge status={a.status} />
+                            </SelectValue>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell text-muted-foreground">
+                          {a.location ?? "—"}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell text-muted-foreground">
+                          {a.source}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-muted-foreground">
+                          {fmtDate(a.appliedDate)}
+                        </TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => openEdit(a)}>
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link
+                                  to="/applications/$id"
+                                  params={{ id: a.id }}
+                                >
+                                  View details
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  void duplicate(a.id);
+                                  toast.success("Application duplicated");
+                                }}
+                              >
+                                Duplicate
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => setPendingDelete(a)}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
+            </>
           )}
         </TabsContent>
 

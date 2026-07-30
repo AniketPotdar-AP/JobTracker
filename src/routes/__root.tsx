@@ -129,8 +129,9 @@ function AppShell() {
   return (
     <div className="flex min-h-screen w-full bg-background text-foreground">
       <Sidebar />
-      <main className="flex-1 min-w-0 pb-20 md:pb-0">
-        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <main className="flex-1 min-w-0 overflow-y-auto">
+        {/* On mobile: pad bottom enough for nav bar + safe area */}
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 pb-nav-safe md:pb-8">
           <Outlet />
         </div>
       </main>

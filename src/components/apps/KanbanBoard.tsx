@@ -230,7 +230,7 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveId(null)}
       >
-        <div className="flex gap-3 overflow-x-auto pb-4">
+        <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0">
           {visibleStatuses.map((status) => (
             <Column
               key={status}
@@ -249,6 +249,7 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
             </div>
           )}
         </div>
+
         <DragOverlay>
           {active ? <KanbanCard app={active} dragging /> : null}
         </DragOverlay>
@@ -288,7 +289,7 @@ function Column({
     <div
       ref={setNodeRef}
       className={cn(
-        "group/col flex w-72 shrink-0 flex-col rounded-lg border bg-muted/30 transition-colors",
+        "group/col flex w-[85vw] max-w-[300px] sm:w-72 shrink-0 snap-center flex-col rounded-lg border bg-muted/30 transition-colors",
         isOver && "bg-primary/5 border-primary/40",
       )}
     >

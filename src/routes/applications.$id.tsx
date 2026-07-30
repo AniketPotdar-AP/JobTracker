@@ -58,26 +58,26 @@ function DetailsPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="truncate text-2xl font-semibold tracking-tight">{app.company}</h1>
+            <h1 className="truncate text-xl sm:text-2xl font-bold tracking-tight">{app.company}</h1>
           </div>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-muted-foreground">
             <span className="flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" /> {app.title}</span>
             {app.location && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {app.location}</span>}
             <span>{WORK_MODE_LABEL[app.workMode]}</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
           <Select value={app.status} onValueChange={(v) => setPendingStatus(v as Status)}>
-            <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-48 h-10"><SelectValue /></SelectTrigger>
             <SelectContent>
               {STATUS_ORDER.map((s) => <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /> Edit</Button>
-          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setConfirmDelete(true)} title="Delete">
+          <Button variant="outline" size="sm" className="h-10" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /> Edit</Button>
+          <Button variant="ghost" size="icon" className="h-10 w-10 text-destructive" onClick={() => setConfirmDelete(true)} title="Delete">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -86,13 +86,15 @@ function DetailsPage() {
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
           <Tabs defaultValue="overview">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="timeline">Timeline</TabsTrigger>
-              <TabsTrigger value="interviews">Interviews</TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
-              <TabsTrigger value="history">Status history</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+              <TabsList className="w-max min-w-full justify-start">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="timeline" className="hidden sm:inline-flex">Timeline</TabsTrigger>
+                <TabsTrigger value="interviews" className="hidden sm:inline-flex">Interviews</TabsTrigger>
+                <TabsTrigger value="notes">Notes</TabsTrigger>
+                <TabsTrigger value="history">Status history</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="overview" className="mt-4">
               <Card>
