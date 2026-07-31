@@ -9,6 +9,7 @@ export type Status =
   | "on_hold"
   | "rejected"
   | "ghosted"
+  | "position_filled"
   | "offer"
   | "joined";
 
@@ -23,6 +24,7 @@ export const STATUS_ORDER: Status[] = [
   "on_hold",
   "rejected",
   "ghosted",
+  "position_filled",
   "offer",
   "joined",
 ];
@@ -38,6 +40,7 @@ export const STATUS_LABEL: Record<Status, string> = {
   on_hold: "On Hold",
   rejected: "Rejected",
   ghosted: "Ghosted",
+  position_filled: "Position Filled",
   offer: "Offer",
   joined: "Joined",
 };
@@ -54,7 +57,7 @@ export const STATUS_CLASS: Record<Status, string> = {
   on_hold: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300 border-amber-200/60 dark:border-amber-500/20",
   rejected: "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300 border-red-200/60 dark:border-red-500/20",
   ghosted: "bg-slate-200 text-slate-700 dark:bg-slate-600/25 dark:text-slate-300 border-slate-300/60 dark:border-slate-500/20",
-  offer: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-500/20",
+  position_filled: "bg-orange-100 text-orange-800 dark:bg-orange-500/15 dark:text-orange-300 border-orange-200/60 dark:border-orange-500/20", offer: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-500/20",
   joined: "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300 border-green-200/60 dark:border-green-500/20",
 };
 
@@ -114,3 +117,7 @@ export const LOCATION_SUGGESTIONS = [
 
 /** Quick-pick resume names offered in the application form (free text still allowed). */
 export const RESUME_SUGGESTIONS = ["Angular resume", "React resume", "Fullstack resume"];
+
+/** Quick-pick position names offered in the application form (free text still allowed). */
+export const POSITION_SUGGESTIONS = ["Angular Developer", "Frontend Developer", "React Developer", "Full Stack Developer", "Node.js Developer"];
+

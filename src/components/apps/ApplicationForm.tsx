@@ -1,13 +1,40 @@
 import { useEffect, useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { INTERVIEW_STATUSES, STATUS_ORDER, STATUS_LABEL, SOURCES, WORK_MODE_LABEL, LOCATION_SUGGESTIONS, RESUME_SUGGESTIONS, type Status, type WorkMode } from "@/lib/status";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  INTERVIEW_STATUSES,
+  STATUS_ORDER,
+  STATUS_LABEL,
+  SOURCES,
+  WORK_MODE_LABEL,
+  LOCATION_SUGGESTIONS,
+  RESUME_SUGGESTIONS,
+  type Status,
+  type WorkMode,
+  POSITION_SUGGESTIONS,
+} from "@/lib/status";
 import { toDateInput } from "@/lib/format";
-import { useApplicationsStore, type Application } from "@/store/useApplications";
+import {
+  useApplicationsStore,
+  type Application,
+} from "@/store/useApplications";
 import { toast } from "sonner";
 
 type Props = {
@@ -23,7 +50,9 @@ const emptyForm = {
   workMode: "remote" as WorkMode,
   appliedDate: toDateInput(new Date().toISOString()),
   status: "applied" as Status,
-  statusDates: { applied: toDateInput(new Date().toISOString()) } as Partial<Record<Status, string>>,
+  statusDates: { applied: toDateInput(new Date().toISOString()) } as Partial<
+    Record<Status, string>
+  >,
   source: "LinkedIn",
   recruiterName: "",
   recruiterEmail: "",
@@ -43,7 +72,10 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
 
   useEffect(() => {
     if (open && editing) {
-      const fresh = useApplicationsStore.getState().applications.find((a) => a.id === editing.id) ?? editing;
+      const fresh =
+        useApplicationsStore
+          .getState()
+          .applications.find((a) => a.id === editing.id) ?? editing;
       const dates: Partial<Record<Status, string>> = {};
       if (Array.isArray(fresh.statusHistory)) {
         for (const sh of fresh.statusHistory) {
@@ -52,11 +84,20 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
           }
         }
       }
-      if (fresh.appliedDate && !dates.applied) dates.applied = toDateInput(fresh.appliedDate);
-      if (fresh.interviewDate && INTERVIEW_STATUSES.includes(fresh.status) && !dates[fresh.status]) {
+      if (fresh.appliedDate && !dates.applied)
+        dates.applied = toDateInput(fresh.appliedDate);
+      if (
+        fresh.interviewDate &&
+        INTERVIEW_STATUSES.includes(fresh.status) &&
+        !dates[fresh.status]
+      ) {
         dates[fresh.status] = toDateInput(fresh.interviewDate);
       }
-      if (fresh.rejectionDate && fresh.status === "rejected" && !dates.rejected) {
+      if (
+        fresh.rejectionDate &&
+        fresh.status === "rejected" &&
+        !dates.rejected
+      ) {
         dates.rejected = toDateInput(fresh.rejectionDate);
       }
       if (fresh.rejectionDate && fresh.status === "ghosted" && !dates.ghosted) {
@@ -66,7 +107,9 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
         dates.on_hold = toDateInput(fresh.followUpDate);
       }
       if (!dates[fresh.status]) {
-        dates[fresh.status] = toDateInput(fresh.updatedAt || fresh.appliedDate || new Date().toISOString());
+        dates[fresh.status] = toDateInput(
+          fresh.updatedAt || fresh.appliedDate || new Date().toISOString(),
+        );
       }
 
       setForm({
@@ -129,13 +172,17 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
       ? new Date(form.statusDates[form.status]!).toISOString()
       : new Date().toISOString();
 
-    const latestInterviewDate = STATUS_ORDER.filter((s) => INTERVIEW_STATUSES.includes(s) && form.statusDates[s])
+    const latestInterviewDate = STATUS_ORDER.filter(
+      (s) => INTERVIEW_STATUSES.includes(s) && form.statusDates[s],
+    )
       .map((s) => new Date(form.statusDates[s]!).toISOString())
       .slice(-1)[0];
 
     const appliedIso = form.statusDates.applied
       ? new Date(form.statusDates.applied).toISOString()
-      : (editing ? editing.appliedDate : new Date().toISOString());
+      : editing
+        ? editing.appliedDate
+        : new Date().toISOString();
 
     const followUpIso = form.followUpDate
       ? new Date(form.followUpDate).toISOString()
@@ -143,7 +190,9 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
 
     const rejectionIso = form.statusDates.rejected
       ? new Date(form.statusDates.rejected).toISOString()
-      : (form.statusDates.ghosted ? new Date(form.statusDates.ghosted).toISOString() : undefined);
+      : form.statusDates.ghosted
+        ? new Date(form.statusDates.ghosted).toISOString()
+        : undefined;
 
     const payload = {
       company: form.company.trim(),
@@ -181,19 +230,41 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0">
         <form onSubmit={submit} className="flex h-full flex-col">
           <SheetHeader className="border-b px-4 sm:px-6 py-4">
-            <SheetTitle>{editing ? "Edit application" : "Add application"}</SheetTitle>
+            <SheetTitle>
+              {editing ? "Edit application" : "Add application"}
+            </SheetTitle>
             <SheetDescription>
-              {editing ? "Update the details for this application." : "Track a new job application."}
+              {editing
+                ? "Update the details for this application."
+                : "Track a new job application."}
             </SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 space-y-5 px-4 sm:px-6 py-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Company *">
-                <Input value={form.company} onChange={(e) => set("company", e.target.value)} placeholder="e.g. Linear" required className="h-11 text-base sm:text-sm" />
+                <Input
+                  value={form.company}
+                  onChange={(e) => set("company", e.target.value)}
+                  placeholder="e.g. Linear"
+                  required
+                  className="h-11 text-base sm:text-sm"
+                />
               </Field>
               <Field label="Job title *">
-                <Input value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. Senior Engineer" required className="h-11 text-base sm:text-sm" />
+                <Input
+                  value={form.title}
+                  onChange={(e) => set("title", e.target.value)}
+                  list="position-suggestions"
+                  required
+                  placeholder="e.g. Senior Engineer"
+                  className="h-11 text-base sm:text-sm"
+                />
+                <datalist id="position-suggestions">
+                  {POSITION_SUGGESTIONS.map((r) => (
+                    <option key={r} value={r} />
+                  ))}
+                </datalist>
               </Field>
               <Field label="Location">
                 <Input
@@ -204,44 +275,74 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
                   className="h-11 text-base sm:text-sm"
                 />
                 <datalist id="location-suggestions">
-                  {LOCATION_SUGGESTIONS.map((l) => <option key={l} value={l} />)}
+                  {LOCATION_SUGGESTIONS.map((l) => (
+                    <option key={l} value={l} />
+                  ))}
                 </datalist>
               </Field>
               <Field label="Work mode">
-                <Select value={form.workMode} onValueChange={(v) => set("workMode", v as WorkMode)}>
-                  <SelectTrigger className="h-11 text-base sm:text-sm"><SelectValue /></SelectTrigger>
+                <Select
+                  value={form.workMode}
+                  onValueChange={(v) => set("workMode", v as WorkMode)}
+                >
+                  <SelectTrigger className="h-11 text-base sm:text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {(Object.keys(WORK_MODE_LABEL) as WorkMode[]).map((k) => (
-                      <SelectItem key={k} value={k}>{WORK_MODE_LABEL[k]}</SelectItem>
+                      <SelectItem key={k} value={k}>
+                        {WORK_MODE_LABEL[k]}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </Field>
               <Field label="Status">
-                <Select value={form.status} onValueChange={(v) => handleStatusChange(v as Status)}>
-                  <SelectTrigger className="h-11 text-base sm:text-sm"><SelectValue /></SelectTrigger>
+                <Select
+                  value={form.status}
+                  onValueChange={(v) => handleStatusChange(v as Status)}
+                >
+                  <SelectTrigger className="h-11 text-base sm:text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {STATUS_ORDER.map((s) => (
-                      <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>
+                      <SelectItem key={s} value={s}>
+                        {STATUS_LABEL[s]}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </Field>
               <Field label="Source">
-                <Select value={form.source} onValueChange={(v) => set("source", v)}>
-                  <SelectTrigger className="h-11 text-base sm:text-sm"><SelectValue /></SelectTrigger>
+                <Select
+                  value={form.source}
+                  onValueChange={(v) => set("source", v)}
+                >
+                  <SelectTrigger className="h-11 text-base sm:text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
-                    {SOURCES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    {SOURCES.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </Field>
 
               {/* Render separate date field for each active or previous status */}
-              {STATUS_ORDER.filter((s) => Boolean(form.statusDates[s]) || s === form.status).map((s) => (
+              {STATUS_ORDER.filter(
+                (s) => Boolean(form.statusDates[s]) || s === form.status,
+              ).map((s) => (
                 <Field key={s} label={`${STATUS_LABEL[s]} date`}>
                   <Input
                     type="date"
-                    value={form.statusDates[s] ?? toDateInput(new Date().toISOString())}
+                    value={
+                      form.statusDates[s] ??
+                      toDateInput(new Date().toISOString())
+                    }
                     className="h-11 text-base sm:text-sm"
                     onChange={(e) => {
                       const val = e.target.value;
@@ -255,16 +356,36 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
               ))}
 
               <Field label="Recruiter name">
-                <Input value={form.recruiterName} onChange={(e) => set("recruiterName", e.target.value)} className="h-11 text-base sm:text-sm" />
+                <Input
+                  value={form.recruiterName}
+                  onChange={(e) => set("recruiterName", e.target.value)}
+                  className="h-11 text-base sm:text-sm"
+                />
               </Field>
               <Field label="Recruiter email">
-                <Input type="email" value={form.recruiterEmail} onChange={(e) => set("recruiterEmail", e.target.value)} className="h-11 text-base sm:text-sm" />
+                <Input
+                  type="email"
+                  value={form.recruiterEmail}
+                  onChange={(e) => set("recruiterEmail", e.target.value)}
+                  className="h-11 text-base sm:text-sm"
+                />
               </Field>
               <Field label="Job URL">
-                <Input type="url" value={form.jobUrl} onChange={(e) => set("jobUrl", e.target.value)} placeholder="https://..." className="h-11 text-base sm:text-sm" />
+                <Input
+                  type="url"
+                  value={form.jobUrl}
+                  onChange={(e) => set("jobUrl", e.target.value)}
+                  placeholder="https://..."
+                  className="h-11 text-base sm:text-sm"
+                />
               </Field>
               <Field label="Salary / CTC">
-                <Input value={form.salary} onChange={(e) => set("salary", e.target.value)} placeholder="e.g. 3 LPA" className="h-11 text-base sm:text-sm" />
+                <Input
+                  value={form.salary}
+                  onChange={(e) => set("salary", e.target.value)}
+                  placeholder="e.g. 3 LPA"
+                  className="h-11 text-base sm:text-sm"
+                />
               </Field>
               <Field label="Resume used">
                 <Input
@@ -275,21 +396,48 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
                   className="h-11 text-base sm:text-sm"
                 />
                 <datalist id="resume-suggestions">
-                  {RESUME_SUGGESTIONS.map((r) => <option key={r} value={r} />)}
+                  {RESUME_SUGGESTIONS.map((r) => (
+                    <option key={r} value={r} />
+                  ))}
                 </datalist>
               </Field>
               <Field label="Follow-up date">
-                <Input type="date" value={form.followUpDate} onChange={(e) => set("followUpDate", e.target.value)} className="h-11 text-base sm:text-sm" />
+                <Input
+                  type="date"
+                  value={form.followUpDate}
+                  onChange={(e) => set("followUpDate", e.target.value)}
+                  className="h-11 text-base sm:text-sm"
+                />
               </Field>
               <Field label="Notes" className="sm:col-span-2">
-                <Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={3} className="text-base sm:text-sm" />
+                <Textarea
+                  value={form.notes}
+                  onChange={(e) => set("notes", e.target.value)}
+                  rows={3}
+                  className="text-base sm:text-sm"
+                />
               </Field>
             </div>
           </div>
 
-          <SheetFooter className="border-t px-4 sm:px-6 py-4 flex-row justify-end gap-2" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
-            <Button type="button" variant="ghost" className="h-11 text-base sm:text-sm" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" className="h-11 text-base sm:text-sm font-semibold">{editing ? "Save changes" : "Add application"}</Button>
+          <SheetFooter
+            className="border-t px-4 sm:px-6 py-4 flex-row justify-end gap-2"
+            style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+          >
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-11 text-base sm:text-sm"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="h-11 text-base sm:text-sm font-semibold"
+            >
+              {editing ? "Save changes" : "Add application"}
+            </Button>
           </SheetFooter>
         </form>
       </SheetContent>
@@ -297,10 +445,20 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
   );
 }
 
-function Field({ label, className, children }: { label: string; className?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  className,
+  children,
+}: {
+  label: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className={className}>
-      <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">{label}</Label>
+      <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+        {label}
+      </Label>
       {children}
     </div>
   );
