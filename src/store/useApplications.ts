@@ -28,7 +28,7 @@ export type Application = {
   appliedDate: string;
   status: Status;
   source: string;
-  sourceName: string;
+  sourceName?: string;
   recruiterName?: string;
   recruiterEmail?: string;
   jobUrl?: string;

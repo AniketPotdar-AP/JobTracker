@@ -25,6 +25,7 @@ CREATE TABLE public.applications (
   applied_date TIMESTAMPTZ NOT NULL DEFAULT now(),
   status TEXT NOT NULL DEFAULT 'applied',
   source TEXT NOT NULL DEFAULT 'Other',
+  source_name TEXT,
   recruiter_name TEXT,
   recruiter_email TEXT,
   job_url TEXT,

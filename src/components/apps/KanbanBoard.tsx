@@ -118,6 +118,20 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
     writeLocal(HIDDEN_KEY, []);
   }
 
+  function moveColumn(status: Status, dir: -1 | 1) {
+    setOrder((prev) => {
+      const idx = prev.indexOf(status);
+      if (idx === -1) return prev;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= prev.length) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(idx, 1);
+      next.splice(targetIdx, 0, moved);
+      writeLocal(ORDER_KEY, next);
+      return next;
+    });
+  }
+
   const visibleStatuses = useMemo(() => order.filter((s) => !hidden.includes(s)), [order, hidden]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
