@@ -164,16 +164,16 @@ function DashboardPage() {
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between p-4">
             <CardTitle className="text-base">Recent applications</CardTitle>
             <Link to="/applications" className="text-xs text-primary hover:underline">View all</Link>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-2 p-4">
             {recent.length === 0 && <p className="text-sm text-muted-foreground">No applications yet.</p>}
             {recent.map((a) => (
               <div
                 key={a.id}
-                className="flex items-center justify-between gap-3 rounded-md px-3 py-2 border bg-card/60"
+                className="flex items-center justify-between gap-3 rounded-md px-2 py-2 border bg-card/60"
               >
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{a.company}</div>
