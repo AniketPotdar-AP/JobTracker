@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
-import { INTERVIEW_STATUSES, STATUS_LABEL, type Priority, type Status, type WorkMode } from "@/lib/status";
+import { ACTUAL_INTERVIEW_STATUSES, INTERVIEW_STATUSES, STATUS_LABEL, type Priority, type Status, type WorkMode } from "@/lib/status";
 import { readLocal, storageKeys, writeLocal } from "@/lib/local-store";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -313,7 +313,7 @@ export const useApplicationsStore = create<State>()((set, get) => {
       if (!current) return;
       const t = statusDateIso ?? now();
       const extraPatch: Partial<Application> = {};
-      if (INTERVIEW_STATUSES.includes(status)) {
+      if (ACTUAL_INTERVIEW_STATUSES.includes(status)) {
         extraPatch.interviewDate = t;
       } else if (status === "rejected" || status === "ghosted") {
         extraPatch.rejectionDate = t;

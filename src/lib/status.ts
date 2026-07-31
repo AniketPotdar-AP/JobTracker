@@ -61,13 +61,17 @@ export const STATUS_CLASS: Record<Status, string> = {
   joined: "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300 border-green-200/60 dark:border-green-500/20",
 };
 
-export const INTERVIEW_STATUSES: Status[] = [
-  "recruiter_call",
+export const ACTUAL_INTERVIEW_STATUSES: Status[] = [
   "assessment",
   "l1_interview",
   "l2_interview",
   "l3_interview",
   "hr_interview",
+];
+
+export const INTERVIEW_STATUSES: Status[] = [
+  "recruiter_call",
+  ...ACTUAL_INTERVIEW_STATUSES,
 ];
 
 export const IN_PROGRESS_STATUSES: Status[] = ["applied", ...INTERVIEW_STATUSES, "on_hold"];

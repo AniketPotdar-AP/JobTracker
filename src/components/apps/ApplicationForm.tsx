@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  ACTUAL_INTERVIEW_STATUSES,
   INTERVIEW_STATUSES,
   STATUS_ORDER,
   STATUS_LABEL,
@@ -89,7 +90,7 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
         dates.applied = toDateInput(fresh.appliedDate);
       if (
         fresh.interviewDate &&
-        INTERVIEW_STATUSES.includes(fresh.status) &&
+        ACTUAL_INTERVIEW_STATUSES.includes(fresh.status) &&
         !dates[fresh.status]
       ) {
         dates[fresh.status] = toDateInput(fresh.interviewDate);
@@ -175,7 +176,7 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
       : new Date().toISOString();
 
     const latestInterviewDate = STATUS_ORDER.filter(
-      (s) => INTERVIEW_STATUSES.includes(s) && form.statusDates[s],
+      (s) => ACTUAL_INTERVIEW_STATUSES.includes(s) && form.statusDates[s],
     )
       .map((s) => new Date(form.statusDates[s]!).toISOString())
       .slice(-1)[0];

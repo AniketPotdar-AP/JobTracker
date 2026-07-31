@@ -44,7 +44,7 @@ const KIND_STYLE: Record<EntryKind, string> = {
 };
 
 const KIND_LABEL: Record<EntryKind, string> = {
-  recruiter_call: "Recruite call",
+  recruiter_call: "Recruiter call",
   interview: "Interviews",
   followup: "Follow-ups",
   rejection: "Rejections",
@@ -124,10 +124,27 @@ function CalendarPage() {
         }
       }
 
+      // 1b. Process explicit interviews array if present
+      if (Array.isArray(a.interviews)) {
+        for (const iv of a.interviews) {
+          if (!iv.at) continue;
+          const dayStr = iv.at.slice(0, 10);
+          if (!hasAdded(dayStr, "interview")) {
+            markAdded(dayStr, "interview");
+            pushEntry(iv.at, {
+              id: `iv-arr-${a.id}-${iv.id}-${dayStr}`,
+              company: `${a.company} (${iv.type || "Interview"})`,
+              kind: "interview",
+              appId: a.id,
+            });
+          }
+        }
+      }
+
       // 2. Process explicit date fields (with deduplication)
       if (a.interviewDate) {
         const dayStr = a.interviewDate.slice(0, 10);
-        if (!hasAdded(dayStr, "interview")) {
+        if (!hasAdded(dayStr, "interview") && !hasAdded(dayStr, "recruiter_call")) {
           markAdded(dayStr, "interview");
           pushEntry(a.interviewDate, {
             id: `iv-${a.id}-${dayStr}`,
@@ -176,7 +193,7 @@ function CalendarPage() {
     <>
       <PageHeader
         title="Calendar"
-        description="Recruite call, interviews, follow-ups, rejections, ghosted, and hold tracking"
+        description="Recruiter call, interviews, follow-ups, rejections, ghosted, and hold tracking"
         actions={
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon" onClick={() => setMonth(subMonths(month, 1))}>
@@ -282,7 +299,7 @@ function CalendarPage() {
 
             <div className="mt-6 pt-4 border-t space-y-2 text-xs text-muted-foreground shrink-0 w-full min-w-0">
               <div className="font-semibold text-foreground mb-2">Event Categories</div>
-              <div className="flex items-center justify-between gap-2 min-w-0"><span className="flex items-center gap-2 truncate"><span className="h-2.5 w-2.5 rounded-full bg-teal-500 shrink-0" /> Recruite call</span><span className="text-[11px] text-muted-foreground shrink-0">Teal</span></div>
+              <div className="flex items-center justify-between gap-2 min-w-0"><span className="flex items-center gap-2 truncate"><span className="h-2.5 w-2.5 rounded-full bg-teal-500 shrink-0" /> Recruiter call</span><span className="text-[11px] text-muted-foreground shrink-0">Teal</span></div>
               <div className="flex items-center justify-between gap-2 min-w-0"><span className="flex items-center gap-2 truncate"><span className="h-2.5 w-2.5 rounded-full bg-violet-500 shrink-0" /> Interviews</span><span className="text-[11px] text-muted-foreground shrink-0">Violet</span></div>
               <div className="flex items-center justify-between gap-2 min-w-0"><span className="flex items-center gap-2 truncate"><span className="h-2.5 w-2.5 rounded-full bg-blue-500 shrink-0" /> Follow-ups</span><span className="text-[11px] text-muted-foreground shrink-0">Blue</span></div>
               <div className="flex items-center justify-between gap-2 min-w-0"><span className="flex items-center gap-2 truncate"><span className="h-2.5 w-2.5 rounded-full bg-rose-500 shrink-0" /> Rejections</span><span className="text-[11px] text-muted-foreground shrink-0">Rose</span></div>
