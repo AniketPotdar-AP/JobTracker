@@ -28,9 +28,6 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": [
-    "productivity",
-    "business"
-  ],
+  "categories": ["productivity", "business"],
   "screenshots": []
 }

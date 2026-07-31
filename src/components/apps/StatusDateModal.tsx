@@ -22,7 +22,13 @@ type Props = {
   onConfirm: (dateIso: string) => void;
 };
 
-export function StatusDateModal({ open, onOpenChange, companyName, targetStatus, onConfirm }: Props) {
+export function StatusDateModal({
+  open,
+  onOpenChange,
+  companyName,
+  targetStatus,
+  onConfirm,
+}: Props) {
   const [dateStr, setDateStr] = useState("");
 
   useEffect(() => {
@@ -34,7 +40,9 @@ export function StatusDateModal({ open, onOpenChange, companyName, targetStatus,
   if (!targetStatus) return null;
 
   function handleConfirm() {
-    const iso = dateStr ? new Date(dateStr).toISOString() : new Date().toISOString();
+    const iso = dateStr
+      ? new Date(dateStr).toISOString()
+      : new Date().toISOString();
     onConfirm(iso);
     onOpenChange(false);
   }
@@ -45,9 +53,13 @@ export function StatusDateModal({ open, onOpenChange, companyName, targetStatus,
         <AlertDialogHeader>
           <AlertDialogTitle>Select Status Date</AlertDialogTitle>
           <AlertDialogDescription>
-            Updating status for <span className="font-semibold text-foreground">{companyName}</span> to{" "}
-            <span className="font-semibold text-foreground">{STATUS_LABEL[targetStatus]}</span>.
-            Select the date for this status change to show on your calendar.
+            Updating status for{" "}
+            <span className="font-semibold text-foreground">{companyName}</span>{" "}
+            to{" "}
+            <span className="font-semibold text-foreground">
+              {STATUS_LABEL[targetStatus]}
+            </span>
+            . Select the date for this status change to show on your calendar.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-3 space-y-2">
@@ -60,7 +72,9 @@ export function StatusDateModal({ open, onOpenChange, companyName, targetStatus,
           />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => onOpenChange(false)}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => onOpenChange(false)}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction onClick={handleConfirm}>
             Save Status & Date
           </AlertDialogAction>

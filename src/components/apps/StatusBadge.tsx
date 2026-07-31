@@ -1,7 +1,13 @@
 import { cn } from "@/lib/utils";
 import { STATUS_CLASS, STATUS_LABEL, type Status } from "@/lib/status";
 
-export function StatusBadge({ status, className }: { status: Status; className?: string }) {
+export function StatusBadge({
+  status,
+  className,
+}: {
+  status: Status;
+  className?: string;
+}) {
   return (
     <span
       className={cn(

@@ -3,7 +3,13 @@ import { Briefcase, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuthStore } from "@/store/useAuth";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -48,7 +54,9 @@ export function LoginScreen() {
           return;
         }
         if (res.needsConfirmation) {
-          toast.success("Check your inbox to confirm your email, then sign in.");
+          toast.success(
+            "Check your inbox to confirm your email, then sign in.",
+          );
           setMode("signin");
         } else {
           toast.success("Account created");
@@ -71,39 +79,51 @@ export function LoginScreen() {
         <div className="mb-8 flex flex-col items-center text-center">
           <img className="w-24 h-24" src="/jobtracker.png" alt="" />
           <h1 className="mt-4 text-2xl font-bold tracking-tight">JobTrack</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">Your job applications, securely in the cloud</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Your job applications, securely in the cloud
+          </p>
         </div>
 
         <Card className="shadow-xl border-border/60">
           <CardHeader className="pb-4">
             <CardTitle className="text-base">
-              {mode === "signin" ? "Sign in to your account" : "Create an account"}
+              {mode === "signin"
+                ? "Sign in to your account"
+                : "Create an account"}
             </CardTitle>
-            <CardDescription>Your applications are private to your account.</CardDescription>
+            <CardDescription>
+              Your applications are private to your account.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {/* Tab Switcher */}
             <div className="grid w-full grid-cols-2 rounded-xl bg-muted p-1 text-muted-foreground mb-6">
               <button
                 type="button"
-                onClick={() => { setMode("signin"); setError(null); }}
+                onClick={() => {
+                  setMode("signin");
+                  setError(null);
+                }}
                 className={cn(
                   "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   mode === "signin"
                     ? "bg-background text-foreground shadow-sm"
-                    : "hover:bg-background/50 hover:text-foreground"
+                    : "hover:bg-background/50 hover:text-foreground",
                 )}
               >
                 Sign in
               </button>
               <button
                 type="button"
-                onClick={() => { setMode("signup"); setError(null); }}
+                onClick={() => {
+                  setMode("signup");
+                  setError(null);
+                }}
                 className={cn(
                   "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   mode === "signup"
                     ? "bg-background text-foreground shadow-sm"
-                    : "hover:bg-background/50 hover:text-foreground"
+                    : "hover:bg-background/50 hover:text-foreground",
                 )}
               >
                 Sign up
@@ -113,7 +133,9 @@ export function LoginScreen() {
             <div className="space-y-5">
               {mode === "signup" && (
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">Full name</Label>
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Full name
+                  </Label>
                   <Input
                     id="name"
                     value={name}
@@ -121,13 +143,17 @@ export function LoginScreen() {
                     placeholder="Full Name"
                     autoComplete="name"
                     className="h-12 text-base"
-                    onKeyDown={(e) => { if (e.key === "Enter") void submit(e); }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") void submit(e);
+                    }}
                   />
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Email address
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -137,29 +163,39 @@ export function LoginScreen() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   className="h-12 text-base"
-                  onKeyDown={(e) => { if (e.key === "Enter") void submit(e); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") void submit(e);
+                  }}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </Label>
                 <Input
                   id="password"
                   type="password"
                   required
                   minLength={6}
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  autoComplete={
+                    mode === "signin" ? "current-password" : "new-password"
+                  }
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="h-12 text-base"
-                  onKeyDown={(e) => { if (e.key === "Enter") void submit(e); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") void submit(e);
+                  }}
                 />
               </div>
 
               {error && (
                 <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3">
-                  <p className="text-sm text-destructive font-medium">{error}</p>
+                  <p className="text-sm text-destructive font-medium">
+                    {error}
+                  </p>
                 </div>
               )}
 

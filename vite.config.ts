@@ -4,11 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [
-    viteReact(),
-    tailwindcss(),
-    tsconfigPaths(),
-  ],
+  plugins: [viteReact(), tailwindcss(), tsconfigPaths()],
   build: {
     outDir: "dist",
     rollupOptions: {

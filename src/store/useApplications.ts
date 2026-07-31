@@ -1,7 +1,14 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
-import { ACTUAL_INTERVIEW_STATUSES, INTERVIEW_STATUSES, STATUS_LABEL, type Priority, type Status, type WorkMode } from "@/lib/status";
+import {
+  ACTUAL_INTERVIEW_STATUSES,
+  INTERVIEW_STATUSES,
+  STATUS_LABEL,
+  type Priority,
+  type Status,
+  type WorkMode,
+} from "@/lib/status";
 import { readLocal, storageKeys, writeLocal } from "@/lib/local-store";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,7 +22,14 @@ export type Interview = {
 export type ActivityEntry = {
   id: string;
   at: string;
-  kind: "created" | "updated" | "status" | "note" | "interview" | "archived" | "duplicated";
+  kind:
+    | "created"
+    | "updated"
+    | "status"
+    | "note"
+    | "interview"
+    | "archived"
+    | "duplicated";
   message: string;
 };
 
@@ -31,6 +45,7 @@ export type Application = {
   sourceName?: string;
   recruiterName?: string;
   recruiterEmail?: string;
+  recruiterPhone?: string;
   jobUrl?: string;
   salary?: string;
   resumeUsed?: string;
@@ -54,7 +69,13 @@ const now = () => new Date().toISOString();
 
 type NewApp = Omit<
   Application,
-  "id" | "createdAt" | "updatedAt" | "statusHistory" | "interviews" | "activity" | "archived"
+  | "id"
+  | "createdAt"
+  | "updatedAt"
+  | "statusHistory"
+  | "interviews"
+  | "activity"
+  | "archived"
 > & { archived?: boolean };
 
 /* ------------------------------------------------------------------ */
@@ -76,6 +97,7 @@ function fromRow(r: Row): Application {
     sourceName: (r.source_name as string) ?? undefined,
     recruiterName: (r.recruiter_name as string) ?? undefined,
     recruiterEmail: (r.recruiter_email as string) ?? undefined,
+    recruiterPhone: (r.recruiter_phone as string) ?? undefined,
     jobUrl: (r.job_url as string) ?? undefined,
     salary: (r.salary as string) ?? undefined,
     resumeUsed: (r.resume_used as string) ?? undefined,
@@ -109,6 +131,7 @@ function toRow(patch: Partial<Application>): Row {
     sourceName: "source_name",
     recruiterName: "recruiter_name",
     recruiterEmail: "recruiter_email",
+    recruiterPhone: "recruiter_phone",
     jobUrl: "job_url",
     salary: "salary",
     resumeUsed: "resume_used",
@@ -145,12 +168,23 @@ type State = {
   hasHydrated: boolean;
   loading: boolean;
   userId: string | null;
-  add: (data: NewApp, customStatusDateIso?: string) => Promise<Application | undefined>;
-  update: (id: string, patch: Partial<Application>, customDateIso?: string) => Promise<void>;
+  add: (
+    data: NewApp,
+    customStatusDateIso?: string,
+  ) => Promise<Application | undefined>;
+  update: (
+    id: string,
+    patch: Partial<Application>,
+    customDateIso?: string,
+  ) => Promise<void>;
   remove: (id: string) => Promise<void>;
   duplicate: (id: string) => Promise<void>;
   archive: (id: string, archived?: boolean) => Promise<void>;
-  setStatus: (id: string, status: Status, statusDateIso?: string) => Promise<void>;
+  setStatus: (
+    id: string,
+    status: Status,
+    statusDateIso?: string,
+  ) => Promise<void>;
   addInterview: (id: string, interview: Omit<Interview, "id">) => Promise<void>;
   clearAll: () => Promise<void>;
   importData: (data: Application[]) => Promise<void>;
@@ -198,7 +232,12 @@ export const useApplicationsStore = create<State>()((set, get) => {
       const cacheKey = `jat.apps.${userId}`;
       const cached = readLocal<Application[]>(cacheKey);
       if (cached && Array.isArray(cached)) {
-        set({ userId, applications: cached, hasHydrated: true, loading: false });
+        set({
+          userId,
+          applications: cached,
+          hasHydrated: true,
+          loading: false,
+        });
       } else {
         set({ userId, loading: true, hasHydrated: true });
       }
@@ -208,7 +247,8 @@ export const useApplicationsStore = create<State>()((set, get) => {
         set({ loading: false, hasHydrated: true });
       }
     },
-    unloadUser: () => set({ userId: null, applications: [], hasHydrated: true }),
+    unloadUser: () =>
+      set({ userId: null, applications: [], hasHydrated: true }),
 
     hydrateTheme: () => {
       const theme = readLocal<"light" | "dark">(storageKeys.theme) ?? "light";
@@ -234,11 +274,19 @@ export const useApplicationsStore = create<State>()((set, get) => {
         user_id: userId,
         status_history: [{ status: data.status, at: t }],
         activity: [
-          { id: nanoid(6), at: t, kind: "created", message: `Added ${data.company} — ${data.title}` },
+          {
+            id: nanoid(6),
+            at: t,
+            kind: "created",
+            message: `Added ${data.company} — ${data.title}`,
+          },
         ],
         interviews: [],
       };
-      const { data: row, error } = await table().insert(payload as never).select("*").single();
+      const { data: row, error } = await table()
+        .insert(payload as never)
+        .select("*")
+        .single();
       if (error) {
         fail(error, "Could not save the application.");
         return undefined;
@@ -256,7 +304,12 @@ export const useApplicationsStore = create<State>()((set, get) => {
       const t = customDateIso ?? now();
       const statusChanged = !!patch.status && patch.status !== current.status;
       const entry: ActivityEntry = statusChanged
-        ? { id: nanoid(6), at: t, kind: "status", message: `Status changed to ${STATUS_LABEL[patch.status!] ?? patch.status}` }
+        ? {
+            id: nanoid(6),
+            at: t,
+            kind: "status",
+            message: `Status changed to ${STATUS_LABEL[patch.status!] ?? patch.status}`,
+          }
         : { id: nanoid(6), at: t, kind: "updated", message: "Updated details" };
       const next: Application = {
         ...current,
@@ -298,7 +351,15 @@ export const useApplicationsStore = create<State>()((set, get) => {
     duplicate: async (id) => {
       const src = get().applications.find((a) => a.id === id);
       if (!src) return;
-      const { id: _id, createdAt: _c, updatedAt: _u, statusHistory: _s, interviews: _i, activity: _a, ...rest } = src;
+      const {
+        id: _id,
+        createdAt: _c,
+        updatedAt: _u,
+        statusHistory: _s,
+        interviews: _i,
+        activity: _a,
+        ...rest
+      } = src;
       await get().add({ ...rest, company: `${src.company} (copy)` });
     },
 
@@ -338,9 +399,15 @@ export const useApplicationsStore = create<State>()((set, get) => {
         updatedAt: now(),
         activity: [entry, ...src.activity].slice(0, 50),
       };
-      set({ applications: get().applications.map((a) => (a.id === id ? next : a)) });
+      set({
+        applications: get().applications.map((a) => (a.id === id ? next : a)),
+      });
       const { error } = await table()
-        .update({ interviews: next.interviews, interview_date: next.interviewDate, activity: next.activity } as never)
+        .update({
+          interviews: next.interviews,
+          interview_date: next.interviewDate,
+          activity: next.activity,
+        } as never)
         .eq("id", id);
       if (error) {
         fail(error, "Could not save the interview.");

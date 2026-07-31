@@ -1,5 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Briefcase, CalendarDays, BarChart3, Settings as SettingsIcon } from "lucide-react";
+import {
+  LayoutDashboard,
+  Briefcase,
+  CalendarDays,
+  BarChart3,
+  Settings as SettingsIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -35,8 +41,18 @@ export function MobileNav() {
                 {active && (
                   <span className="absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-primary/20" />
                 )}
-                <it.icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
-                <span className={cn("text-[10px] font-medium tracking-wide", active && "font-semibold")}>
+                <it.icon
+                  className={cn(
+                    "h-5 w-5 transition-transform",
+                    active && "scale-110",
+                  )}
+                />
+                <span
+                  className={cn(
+                    "text-[10px] font-medium tracking-wide",
+                    active && "font-semibold",
+                  )}
+                >
                   {it.label}
                 </span>
               </Link>

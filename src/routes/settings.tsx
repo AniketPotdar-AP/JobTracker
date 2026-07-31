@@ -1,11 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, Upload, Trash2, Moon, Sun, FileSpreadsheet, LogOut } from "lucide-react";
+import {
+  Download,
+  Upload,
+  Trash2,
+  Moon,
+  Sun,
+  FileSpreadsheet,
+  LogOut,
+} from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useApplicationsStore, type Application } from "@/store/useApplications";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  useApplicationsStore,
+  type Application,
+} from "@/store/useApplications";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuth";
 import { exportApplicationsToXlsx } from "@/lib/xlsx-export";
@@ -14,7 +34,10 @@ export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
       { title: "Settings" },
-      { name: "description", content: "Theme, data import and export, and other preferences." },
+      {
+        name: "description",
+        content: "Theme, data import and export, and other preferences.",
+      },
     ],
   }),
   component: SettingsPage,
@@ -32,7 +55,9 @@ function SettingsPage() {
   const logout = useAuthStore((s) => s.signOut);
 
   function doExport() {
-    const blob = new Blob([JSON.stringify(apps, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(apps, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -69,29 +94,48 @@ function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="Settings" description="Manage your preferences and data" />
+      <PageHeader
+        title="Settings"
+        description="Manage your preferences and data"
+      />
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle className="text-base">Account</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-base">Account</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-3">
             <div>
               <div className="text-sm font-medium">{user?.name}</div>
               <div className="text-sm text-muted-foreground">{user?.email}</div>
             </div>
-            <Button variant="outline" size="sm" onClick={() => void logout()}><LogOut className="h-4 w-4" /> Sign out</Button>
+            <Button variant="outline" size="sm" onClick={() => void logout()}>
+              <LogOut className="h-4 w-4" /> Sign out
+            </Button>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-base">Appearance</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-base">Appearance</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">Choose the theme that feels right.</p>
+            <p className="text-sm text-muted-foreground">
+              Choose the theme that feels right.
+            </p>
             <div className="flex gap-2">
-              <Button variant={theme === "light" ? "default" : "outline"} onClick={() => setTheme("light")} size="sm">
+              <Button
+                variant={theme === "light" ? "default" : "outline"}
+                onClick={() => setTheme("light")}
+                size="sm"
+              >
                 <Sun className="h-4 w-4" /> Light
               </Button>
-              <Button variant={theme === "dark" ? "default" : "outline"} onClick={() => setTheme("dark")} size="sm">
+              <Button
+                variant={theme === "dark" ? "default" : "outline"}
+                onClick={() => setTheme("dark")}
+                size="sm"
+              >
                 <Moon className="h-4 w-4" /> Dark
               </Button>
             </div>
@@ -99,15 +143,26 @@ function SettingsPage() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-base">Your data</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-base">Your data</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              All data is stored locally in your browser and kept private to your account. You have {apps.length} applications saved.
+              All data is stored locally in your browser and kept private to
+              your account. You have {apps.length} applications saved.
             </p>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={doExport}><Download className="h-4 w-4" /> Export JSON</Button>
-              <Button size="sm" onClick={() => void doExportExcel()}><FileSpreadsheet className="h-4 w-4" /> Export Excel (.xlsx)</Button>
-              <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+              <Button variant="outline" size="sm" onClick={doExport}>
+                <Download className="h-4 w-4" /> Export JSON
+              </Button>
+              <Button size="sm" onClick={() => void doExportExcel()}>
+                <FileSpreadsheet className="h-4 w-4" /> Export Excel (.xlsx)
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fileRef.current?.click()}
+              >
                 <Upload className="h-4 w-4" /> Import JSON
               </Button>
               <input
@@ -134,15 +189,22 @@ function SettingsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Clear all data?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete all {apps.length} applications from your browser. This cannot be undone.
+              This will permanently delete all {apps.length} applications from
+              your browser. This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90"
-              onClick={() => { void clearAll(); toast.success("All data cleared"); setConfirmClear(false); }}
-            >Clear data</AlertDialogAction>
+              onClick={() => {
+                void clearAll();
+                toast.success("All data cleared");
+                setConfirmClear(false);
+              }}
+            >
+              Clear data
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

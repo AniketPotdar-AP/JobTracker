@@ -63,6 +63,7 @@ import { STATUS_LABEL, STATUS_ORDER, SOURCES, type Status } from "@/lib/status";
 import { fmtDate } from "@/lib/format";
 import { toast } from "sonner";
 import { KanbanBoard } from "@/components/apps/KanbanBoard";
+import { MultiSelect, type Option } from "@/components/ui/multi-select";
 
 export const Route = createFileRoute("/applications/")({
   head: () => ({
@@ -90,11 +91,18 @@ function ApplicationsPage() {
   const [view, setView] = useState<"table" | "kanban">("table");
   const [query, setQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sourceFilter, setSourceFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [sourceFilter, setSourceFilter] = useState<string[]>([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [sortBy, setSortBy] = useState<SortBy>("applied_desc");
+
+  // Draft filter state inside the Sheet (applied only when Done is clicked)
+  const [draftStatusFilter, setDraftStatusFilter] = useState<string[]>([]);
+  const [draftSourceFilter, setDraftSourceFilter] = useState<string[]>([]);
+  const [draftStartDate, setDraftStartDate] = useState("");
+  const [draftEndDate, setDraftEndDate] = useState("");
+  const [draftSortBy, setDraftSortBy] = useState<SortBy>("applied_desc");
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Application | null>(null);
@@ -105,19 +113,58 @@ function ApplicationsPage() {
     targetStatus: Status;
   } | null>(null);
 
+  const statusOptions = useMemo<Option[]>(
+    () =>
+      STATUS_ORDER.map((s) => ({
+        label: STATUS_LABEL[s],
+        value: s,
+        badge: <StatusBadge status={s} />,
+      })),
+    [],
+  );
+
+  const sourceOptions = useMemo<Option[]>(
+    () =>
+      SOURCES.map((s) => ({
+        label: s,
+        value: s,
+      })),
+    [],
+  );
+
   const activeFilters =
-    (statusFilter !== "all" ? 1 : 0) +
-    (sourceFilter !== "all" ? 1 : 0) +
+    (statusFilter.length > 0 ? 1 : 0) +
+    (sourceFilter.length > 0 ? 1 : 0) +
     (startDate ? 1 : 0) +
     (endDate ? 1 : 0) +
     (sortBy !== "applied_desc" ? 1 : 0);
 
-  function resetFilters() {
-    setStatusFilter("all");
-    setSourceFilter("all");
-    setStartDate("");
-    setEndDate("");
-    setSortBy("applied_desc");
+  function handleOpenFiltersSheet(open: boolean) {
+    if (open) {
+      setDraftStatusFilter(statusFilter);
+      setDraftSourceFilter(sourceFilter);
+      setDraftStartDate(startDate);
+      setDraftEndDate(endDate);
+      setDraftSortBy(sortBy);
+    }
+    setFiltersOpen(open);
+  }
+
+  function applyFilters() {
+    setStatusFilter(draftStatusFilter);
+    setSourceFilter(draftSourceFilter);
+    setStartDate(draftStartDate);
+    setEndDate(draftEndDate);
+    setSortBy(draftSortBy);
+    setFiltersOpen(false);
+  }
+
+  function clearDraftFilters() {
+    setDraftStatusFilter([]);
+    setDraftSourceFilter([]);
+    setDraftStartDate("");
+    setDraftEndDate("");
+    setDraftSortBy("applied_desc");
   }
 
   const filtered = useMemo(() => {
@@ -131,10 +178,10 @@ function ApplicationsPage() {
           (a.location ?? "").toLowerCase().includes(q),
       );
     }
-    if (statusFilter !== "all")
-      list = list.filter((a) => a.status === statusFilter);
-    if (sourceFilter !== "all")
-      list = list.filter((a) => a.source === sourceFilter);
+    if (statusFilter.length > 0)
+      list = list.filter((a) => statusFilter.includes(a.status));
+    if (sourceFilter.length > 0)
+      list = list.filter((a) => sourceFilter.includes(a.source));
     if (startDate) {
       const from = new Date(`${startDate}T00:00:00`).getTime();
       list = list.filter((a) => new Date(a.appliedDate).getTime() >= from);
@@ -156,6 +203,39 @@ function ApplicationsPage() {
     });
     return list;
   }, [apps, query, statusFilter, sourceFilter, startDate, endDate, sortBy]);
+
+  const draftFilteredCount = useMemo(() => {
+    let list = [...apps];
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      list = list.filter(
+        (a) =>
+          a.company.toLowerCase().includes(q) ||
+          a.title.toLowerCase().includes(q) ||
+          (a.location ?? "").toLowerCase().includes(q),
+      );
+    }
+    if (draftStatusFilter.length > 0)
+      list = list.filter((a) => draftStatusFilter.includes(a.status));
+    if (draftSourceFilter.length > 0)
+      list = list.filter((a) => draftSourceFilter.includes(a.source));
+    if (draftStartDate) {
+      const from = new Date(`${draftStartDate}T00:00:00`).getTime();
+      list = list.filter((a) => new Date(a.appliedDate).getTime() >= from);
+    }
+    if (draftEndDate) {
+      const to = new Date(`${draftEndDate}T23:59:59`).getTime();
+      list = list.filter((a) => new Date(a.appliedDate).getTime() <= to);
+    }
+    return list.length;
+  }, [
+    apps,
+    query,
+    draftStatusFilter,
+    draftSourceFilter,
+    draftStartDate,
+    draftEndDate,
+  ]);
 
   function openEdit(a: Application) {
     setEditing(a);
@@ -198,7 +278,7 @@ function ApplicationsPage() {
             <Button
               variant="outline"
               className="gap-1.5 shrink-0 flex-1 sm:flex-none h-10"
-              onClick={() => setFiltersOpen(true)}
+              onClick={() => handleOpenFiltersSheet(true)}
             >
               <SlidersHorizontal className="h-4 w-4" />
               <span>Filters</span>
@@ -253,7 +333,9 @@ function ApplicationsPage() {
                         <span className="font-semibold text-base block truncate">
                           {a.company}
                         </span>
-                        <p className="text-xs text-muted-foreground truncate">{a.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {a.title}
+                        </p>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
                         <Button
@@ -307,7 +389,9 @@ function ApplicationsPage() {
                           </SelectValue>
                         </Select>
                       </div>
-                      <span className="text-[11px]">{fmtDate(a.appliedDate)}</span>
+                      <span className="text-[11px]">
+                        {fmtDate(a.appliedDate)}
+                      </span>
                     </div>
                   </Card>
                 ))}
@@ -378,7 +462,10 @@ function ApplicationsPage() {
                               title="View details"
                               asChild
                             >
-                              <Link to="/applications/$id" params={{ id: a.id }}>
+                              <Link
+                                to="/applications/$id"
+                                params={{ id: a.id }}
+                              >
                                 <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                               </Link>
                             </Button>
@@ -420,7 +507,7 @@ function ApplicationsPage() {
         </TabsContent>
       </Tabs>
 
-      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+      <Sheet open={filtersOpen} onOpenChange={handleOpenFiltersSheet}>
         <SheetContent className="w-full sm:max-w-sm overflow-y-auto p-0">
           <SheetHeader className="border-b px-6 py-4">
             <SheetTitle>Filters</SheetTitle>
@@ -434,38 +521,28 @@ function ApplicationsPage() {
               <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                 Status
               </Label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All statuses</SelectItem>
-                  {STATUS_ORDER.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {STATUS_LABEL[s]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <MultiSelect
+                options={statusOptions}
+                value={draftStatusFilter}
+                onChange={setDraftStatusFilter}
+                placeholder="Select statuses..."
+                allLabel="All statuses"
+                showSearch
+              />
             </div>
 
             <div>
               <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                 Source
               </Label>
-              <Select value={sourceFilter} onValueChange={setSourceFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Source" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All sources</SelectItem>
-                  {SOURCES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <MultiSelect
+                options={sourceOptions}
+                value={draftSourceFilter}
+                onChange={setDraftSourceFilter}
+                placeholder="Select sources..."
+                allLabel="All sources"
+                showSearch
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -475,12 +552,13 @@ function ApplicationsPage() {
                 </Label>
                 <Input
                   type="date"
-                  value={startDate}
-                  max={endDate || undefined}
+                  value={draftStartDate}
+                  max={draftEndDate || undefined}
                   onChange={(e) => {
                     const v = e.target.value;
-                    setStartDate(v);
-                    if (endDate && v && endDate < v) setEndDate(v);
+                    setDraftStartDate(v);
+                    if (draftEndDate && v && draftEndDate < v)
+                      setDraftEndDate(v);
                   }}
                 />
               </div>
@@ -490,15 +568,15 @@ function ApplicationsPage() {
                 </Label>
                 <Input
                   type="date"
-                  value={endDate}
-                  min={startDate || undefined}
+                  value={draftEndDate}
+                  min={draftStartDate || undefined}
                   onChange={(e) => {
                     const v = e.target.value;
-                    if (startDate && v && v < startDate) {
+                    if (draftStartDate && v && v < draftStartDate) {
                       toast.error("End date can't be before the start date");
                       return;
                     }
-                    setEndDate(v);
+                    setDraftEndDate(v);
                   }}
                 />
               </div>
@@ -509,8 +587,8 @@ function ApplicationsPage() {
                 Sort by
               </Label>
               <Select
-                value={sortBy}
-                onValueChange={(v) => setSortBy(v as SortBy)}
+                value={draftSortBy}
+                onValueChange={(v) => setDraftSortBy(v as SortBy)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -524,15 +602,15 @@ function ApplicationsPage() {
             </div>
 
             <p className="text-xs text-muted-foreground">
-              {filtered.length} matching applications
+              {draftFilteredCount} matching applications
             </p>
           </div>
 
           <SheetFooter className="border-t px-6 py-4">
-            <Button variant="ghost" onClick={resetFilters}>
+            <Button variant="ghost" onClick={clearDraftFilters}>
               Clear all
             </Button>
-            <Button onClick={() => setFiltersOpen(false)}>Done</Button>
+            <Button onClick={applyFilters}>Done</Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>

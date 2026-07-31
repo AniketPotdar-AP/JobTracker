@@ -19,11 +19,28 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Link } from "@tanstack/react-router";
-import { Eye, Pencil, Trash2, EyeOff, SlidersHorizontal, ArrowLeftRight, GripVertical, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Eye,
+  Pencil,
+  Trash2,
+  EyeOff,
+  SlidersHorizontal,
+  ArrowLeftRight,
+  GripVertical,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { STATUS_ORDER, STATUS_LABEL, type Status } from "@/lib/status";
-import { useApplicationsStore, type Application } from "@/store/useApplications";
+import {
+  useApplicationsStore,
+  type Application,
+} from "@/store/useApplications";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { fmtDate } from "@/lib/format";
 import { readLocal, writeLocal } from "@/lib/local-store";
 import { toast } from "sonner";
@@ -40,12 +57,21 @@ const ORDER_KEY = "jat.kanban.order";
 
 /** Keeps a stored order valid when statuses are added/removed in code. */
 function normalizeOrder(stored: unknown): Status[] {
-  const list = Array.isArray(stored) ? (stored as Status[]).filter((s) => STATUS_ORDER.includes(s)) : [];
+  const list = Array.isArray(stored)
+    ? (stored as Status[]).filter((s) => STATUS_ORDER.includes(s))
+    : [];
   return [...list, ...STATUS_ORDER.filter((s) => !list.includes(s))];
 }
 
 function SortableStatusRow({ status }: { status: Status }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: status });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: status });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -57,7 +83,7 @@ function SortableStatusRow({ status }: { status: Status }) {
       style={style}
       className={cn(
         "flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 border bg-background text-sm font-medium transition-colors hover:bg-accent cursor-grab active:cursor-grabbing select-none",
-        isDragging && "opacity-60 shadow-md border-primary"
+        isDragging && "opacity-60 shadow-md border-primary",
       )}
       {...attributes}
       {...listeners}
@@ -99,7 +125,9 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
 
   function toggleColumn(status: Status) {
     setHidden((prev) => {
-      const next = prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status];
+      const next = prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status];
       writeLocal(HIDDEN_KEY, next);
       return next;
     });
@@ -139,15 +167,23 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
     });
   }
 
-  const visibleStatuses = useMemo(() => order.filter((s) => !hidden.includes(s)), [order, hidden]);
+  const visibleStatuses = useMemo(
+    () => order.filter((s) => !hidden.includes(s)),
+    [order, hidden],
+  );
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+  );
 
   const groups = useMemo(() => {
-    const map: Record<Status, Application[]> = STATUS_ORDER.reduce((acc, s) => {
-      acc[s] = [];
-      return acc;
-    }, {} as Record<Status, Application[]>);
+    const map: Record<Status, Application[]> = STATUS_ORDER.reduce(
+      (acc, s) => {
+        acc[s] = [];
+        return acc;
+      },
+      {} as Record<Status, Application[]>,
+    );
     for (const a of applications) (map[a.status] ?? map.applied).push(a);
     return map;
   }, [applications]);
@@ -196,12 +232,22 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
                 <ArrowLeftRight className="h-4 w-4" /> Reorder
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-64 max-h-80 overflow-y-auto p-2">
+            <PopoverContent
+              align="end"
+              className="w-64 max-h-80 overflow-y-auto p-2"
+            >
               <p className="px-1 pb-2 text-xs font-medium text-muted-foreground">
                 Drag & drop to reorder columns
               </p>
-              <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleReorderDragEnd}>
-                <SortableContext items={order} strategy={verticalListSortingStrategy}>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragEnd={handleReorderDragEnd}
+              >
+                <SortableContext
+                  items={order}
+                  strategy={verticalListSortingStrategy}
+                >
                   <div className="space-y-1">
                     {order.map((s) => (
                       <SortableStatusRow key={s} status={s} />
@@ -218,7 +264,10 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
                 <SlidersHorizontal className="h-4 w-4" /> Columns
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 max-h-80 overflow-y-auto">
+            <DropdownMenuContent
+              align="end"
+              className="w-52 max-h-80 overflow-y-auto"
+            >
               <DropdownMenuLabel>Visible columns</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {order.map((s) => (
@@ -253,7 +302,10 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
               onDelete={onDelete}
               onHide={() => toggleColumn(status)}
               onMove={(dir) => moveColumn(status, dir)}
-              onDuplicate={(id) => { void duplicate(id); toast.success("Duplicated"); }}
+              onDuplicate={(id) => {
+                void duplicate(id);
+                toast.success("Duplicated");
+              }}
             />
           ))}
           {visibleStatuses.length === 0 && (
@@ -270,7 +322,9 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
 
       <StatusDateModal
         open={Boolean(pendingStatusChange)}
-        onOpenChange={(open) => { if (!open) setPendingStatusChange(null); }}
+        onOpenChange={(open) => {
+          if (!open) setPendingStatusChange(null);
+        }}
         companyName={pendingStatusChange?.companyName ?? ""}
         targetStatus={pendingStatusChange?.targetStatus ?? null}
         onConfirm={confirmStatusChange}
@@ -278,7 +332,6 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
     </div>
   );
 }
-
 
 function Column({
   status,
@@ -307,9 +360,13 @@ function Column({
       )}
     >
       <div className="flex items-center justify-between gap-1 px-3 py-2.5 border-b">
-        <div className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">{STATUS_LABEL[status]}</div>
+        <div className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {STATUS_LABEL[status]}
+        </div>
         <div className="flex items-center gap-0.5 shrink-0">
-          <span className="text-xs tabular-nums text-muted-foreground bg-background border rounded-full px-2 py-0.5">{items.length}</span>
+          <span className="text-xs tabular-nums text-muted-foreground bg-background border rounded-full px-2 py-0.5">
+            {items.length}
+          </span>
           <Button
             variant="ghost"
             size="icon"
@@ -350,7 +407,11 @@ function Column({
             onDuplicate={onDuplicate}
           />
         ))}
-        {items.length === 0 && <div className="text-center text-xs text-muted-foreground py-6">No applications</div>}
+        {items.length === 0 && (
+          <div className="text-center text-xs text-muted-foreground py-6">
+            No applications
+          </div>
+        )}
       </div>
     </div>
   );
@@ -366,7 +427,9 @@ function DraggableCard({
   onDelete: (a: Application) => void;
   onDuplicate: (id: string) => void;
 }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: app.id });
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: app.id,
+  });
   return (
     <div
       ref={setNodeRef}
@@ -377,7 +440,11 @@ function DraggableCard({
       <KanbanCard
         app={app}
         actions={
-          <div className="flex items-center gap-0.5 shrink-0" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-0.5 shrink-0"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
             <Button
               variant="ghost"
               size="icon"
@@ -414,13 +481,28 @@ function DraggableCard({
   );
 }
 
-export function KanbanCard({ app, actions, dragging }: { app: Application; actions?: React.ReactNode; dragging?: boolean }) {
+export function KanbanCard({
+  app,
+  actions,
+  dragging,
+}: {
+  app: Application;
+  actions?: React.ReactNode;
+  dragging?: boolean;
+}) {
   return (
-    <div className={cn("rounded-md border bg-card p-3 shadow-sm hover:border-primary/40 transition-colors", dragging && "shadow-lg rotate-1")}>
+    <div
+      className={cn(
+        "rounded-md border bg-card p-3 shadow-sm hover:border-primary/40 transition-colors",
+        dragging && "shadow-lg rotate-1",
+      )}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="truncate text-sm font-semibold">{app.company}</div>
-          <div className="truncate text-xs text-muted-foreground">{app.title}</div>
+          <div className="truncate text-xs text-muted-foreground">
+            {app.title}
+          </div>
         </div>
         {actions}
       </div>

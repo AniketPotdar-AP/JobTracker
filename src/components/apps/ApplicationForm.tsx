@@ -58,6 +58,7 @@ const emptyForm = {
   sourceName: "",
   recruiterName: "",
   recruiterEmail: "",
+  recruiterPhone: "",
   jobUrl: "",
   salary: "",
   resumeUsed: "",
@@ -126,6 +127,7 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
         sourceName: fresh.sourceName ?? "",
         recruiterName: fresh.recruiterName ?? "",
         recruiterEmail: fresh.recruiterEmail ?? "",
+        recruiterPhone: fresh.recruiterPhone ?? "",
         jobUrl: fresh.jobUrl ?? "",
         salary: fresh.salary ?? "",
         resumeUsed: fresh.resumeUsed ?? "",
@@ -208,6 +210,7 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
       sourceName: form.sourceName || undefined,
       recruiterName: form.recruiterName || undefined,
       recruiterEmail: form.recruiterEmail || undefined,
+      recruiterPhone: form.recruiterPhone || undefined,
       jobUrl: form.jobUrl || undefined,
       salary: form.salary || undefined,
       resumeUsed: form.resumeUsed || undefined,
@@ -336,17 +339,17 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
                 </Select>
               </Field>
 
-              {
-                form.source == 'Other' ? (
-                  <Field label="Source name">
-                    <Input
-                      value={form.sourceName}
-                      onChange={(e) => set("sourceName", e.target.value)}
-                      className="h-11 text-base sm:text-sm"
-                    />
-                  </Field>
-                ) : ''
-              }
+              {form.source == "Other" ? (
+                <Field label="Source name">
+                  <Input
+                    value={form.sourceName}
+                    onChange={(e) => set("sourceName", e.target.value)}
+                    className="h-11 text-base sm:text-sm"
+                  />
+                </Field>
+              ) : (
+                ""
+              )}
 
               {/* Render separate date field for each active or previous status */}
               {STATUS_ORDER.filter(
@@ -375,6 +378,7 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
                 <Input
                   value={form.recruiterName}
                   onChange={(e) => set("recruiterName", e.target.value)}
+                  placeholder="e.g. John Doe"
                   className="h-11 text-base sm:text-sm"
                 />
               </Field>
@@ -383,6 +387,16 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
                   type="email"
                   value={form.recruiterEmail}
                   onChange={(e) => set("recruiterEmail", e.target.value)}
+                  placeholder="e.g. john@company.com"
+                  className="h-11 text-base sm:text-sm"
+                />
+              </Field>
+              <Field label="Recruiter phone">
+                <Input
+                  type="tel"
+                  value={form.recruiterPhone}
+                  onChange={(e) => set("recruiterPhone", e.target.value)}
+                  placeholder="e.g. +91 9876543210"
                   className="h-11 text-base sm:text-sm"
                 />
               </Field>

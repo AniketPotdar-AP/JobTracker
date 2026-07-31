@@ -36,7 +36,9 @@ export function Sidebar() {
         <img className="w-8 h-8" src="/jobtracker.png" alt="" />
         <div className="flex flex-col">
           <span className="text-sm font-semibold tracking-tight">JobTrack</span>
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Applications</span>
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            Applications
+          </span>
         </div>
       </div>
 
@@ -73,7 +75,9 @@ export function Sidebar() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="truncate text-xs font-medium">{user.name}</div>
-              <div className="truncate text-[10px] text-muted-foreground">{user.email}</div>
+              <div className="truncate text-[10px] text-muted-foreground">
+                {user.email}
+              </div>
             </div>
           </div>
         )}
@@ -83,8 +87,14 @@ export function Sidebar() {
           className="w-full justify-start gap-2"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
-          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          <span className="text-sm">{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+          {theme === "dark" ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
+          <span className="text-sm">
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </span>
         </Button>
         <Button
           variant="ghost"
