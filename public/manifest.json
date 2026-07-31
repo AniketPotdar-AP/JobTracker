@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "JobTrack",
   "short_name": "JobTrack",
   "description": "Track and organize all your job applications in one clean workspace.",
@@ -10,8 +11,9 @@
   "icons": [
     {
       "src": "/jobtracker.png",
-      "sizes": "48x48",
-      "type": "image/x-icon"
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icon-192.png",
