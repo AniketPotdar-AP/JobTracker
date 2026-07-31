@@ -1,12 +1,17 @@
 # JobTrack — Job Application Tracker
 
-A modern, clean, and responsive job application tracker built as a premium single-user SaaS-style workspace. Manage every application, interview, and follow-up from one place — locally on your device, with zero setup and no account required.
+A modern, clean, and responsive job application tracker built as a premium single-user SaaS-style workspace. Manage every application, interview, and follow-up from one place — synced with Supabase and accessible anywhere.
 
-![Stack](https://img.shields.io/badge/TanStack_Start-v1-blue) ![React](https://img.shields.io/badge/React-19-61dafb) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8) ![License](https://img.shields.io/badge/license-MIT-green)
+![Stack](https://img.shields.io/badge/TanStack_Start-v1-blue) ![React](https://img.shields.io/badge/React-19-61dafb) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8) ![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-3ECF8E) ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
 ## ✨ Features
+
+### Authentication & Security
+
+- **Supabase Authentication**: Secure email & password sign in and sign up.
+- **Row-Level Security (RLS)**: Enforced database security ensuring users only view and manage their own applications.
 
 ### Dashboard
 
@@ -17,9 +22,10 @@ A modern, clean, and responsive job application tracker built as a premium singl
 
 ### Applications
 
-- Rich CRUD for every application (company, role, location, work mode, source, recruiter, salary, resume, links, notes, priority)
+- Rich CRUD for every application (company, title, location, work mode, source, custom `sourceName`, recruiter details, salary, resume, links, notes, priority, rejection date)
 - Toggle between **Table view** and **Kanban board**
-- **Drag-and-drop** status changes on the Kanban (`@dnd-kit`)
+- **Kanban Column Customization**: Drag-and-drop column reordering, quick shift controls, column visibility toggling, and layout reset
+- **Drag-and-drop** application status changes on the Kanban (`@dnd-kit`) with status date prompts
 - Filter, sort, search, and archive
 - Per-application detail page with tabs: **Timeline · Interviews · Status history · Notes**
 
@@ -41,7 +47,7 @@ A modern, clean, and responsive job application tracker built as a premium singl
 - **Import** JSON to restore a backup
 - **Clear all** with confirmation
 
-### UX polish
+### UX Polish
 
 - Fully responsive: desktop, tablet, and mobile (bottom nav on small screens)
 - Beautiful empty states
@@ -71,9 +77,10 @@ All colors are semantic CSS variables — components never hardcode hex values, 
 ## 🧰 Tech Stack
 
 - **Framework:** [TanStack Start](https://tanstack.com/start) v1 (React 19, SSR)
+- **Backend & Auth:** [Supabase](https://supabase.com/) (PostgreSQL Database + Auth + RLS)
 - **Build:** Vite 7
 - **Routing:** TanStack Router (file-based, type-safe)
-- **State:** [Zustand](https://zustand-demo.pmnd.rs/) + `persist` middleware (localStorage key: `jat.v1`)
+- **State:** [Zustand](https://zustand-demo.pmnd.rs/) with Supabase sync & localStorage persistence
 - **UI:** [shadcn/ui](https://ui.shadcn.com/) + Radix primitives
 - **Styling:** Tailwind CSS v4 (native `@import`, oklch color tokens)
 - **Charts:** Recharts
@@ -89,8 +96,28 @@ All colors are semantic CSS variables — components never hardcode hex values, 
 ### Prerequisites
 
 - [Bun](https://bun.sh) ≥ 1.1 (or Node.js ≥ 20 with npm/pnpm)
+- A [Supabase](https://supabase.com) project (for cloud database and authentication)
 
-### Install & run
+### Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
+```
+
+### Database Migrations
+
+Apply the migrations in `supabase/migrations/` to your Supabase instance:
+
+```bash
+npx supabase db push
+```
+
+Alternatively, run the SQL scripts in `supabase/migrations/` inside your **Supabase Dashboard → SQL Editor**.
+
+### Install & Run
 
 ```bash
 bun install
@@ -111,45 +138,53 @@ bun run start
 ## 📁 Project Structure
 
 ```
-src/
-├── routes/                    # File-based routes
-│   ├── __root.tsx             # Root layout, providers, head metadata
-│   ├── index.tsx              # Dashboard
-│   ├── applications.tsx       # /applications layout
-│   ├── applications.index.tsx # Table + Kanban
-│   ├── applications.$id.tsx   # Application details
-│   ├── calendar.tsx           # Monthly calendar
-│   ├── analytics.tsx          # Charts & funnel
-│   └── settings.tsx           # Theme, import/export
-├── components/
-│   ├── apps/                  # ApplicationForm, KanbanBoard, StatusBadge, PriorityDot
-│   ├── layout/                # Sidebar, MobileNav
-│   ├── common/                # PageHeader, EmptyState
-│   └── ui/                    # shadcn primitives
-├── store/
-│   └── useApplications.ts     # Zustand store + seed data
-├── lib/
-│   ├── status.ts              # Status enum, labels, groupings
-│   └── format.ts              # Date/currency helpers
-└── styles.css                 # Tailwind v4 + theme tokens
+.
+├── supabase/
+│   └── migrations/            # PostgreSQL database migration scripts
+├── src/
+│   ├── routes/                # File-based routes
+│   │   ├── __root.tsx         # Root layout, auth listener, head metadata
+│   │   ├── index.tsx          # Dashboard
+│   │   ├── applications.tsx   # /applications layout
+│   │   ├── applications.index.tsx # Table + Kanban
+│   │   ├── applications.$id.tsx   # Application details
+│   │   ├── calendar.tsx       # Monthly calendar
+│   │   ├── analytics.tsx      # Charts & funnel
+│   │   └── settings.tsx       # Theme, import/export
+│   ├── components/
+│   │   ├── apps/              # ApplicationForm, KanbanBoard, StatusBadge, PriorityDot
+│   │   ├── auth/              # LoginScreen, AuthGuard
+│   │   ├── layout/            # Sidebar, MobileNav
+│   │   ├── common/            # PageHeader, EmptyState
+│   │   └── ui/                # shadcn primitives
+│   ├── integrations/
+│   │   └── supabase/          # Supabase client setup & generated types
+│   ├── store/
+│   │   ├── useApplications.ts # Zustand store + Supabase data operations
+│   │   └── useAuth.ts         # Auth state store
+│   ├── lib/
+│   │   ├── status.ts          # Status enum, labels, groupings
+│   │   └── format.ts          # Date/currency helpers
+│   └── styles.css             # Tailwind v4 + theme tokens
 ```
 
 ---
 
 ## 🗂 Data Model
 
-Applications are persisted locally as JSON. Each application:
+Each application record:
 
 ```ts
 type Application = {
   id: string;
   company: string;
   title: string;
-  status: Status; // wishlist → joined (10 states)
+  status: Status; // applied → joined (13 states)
   priority: "low" | "medium" | "high";
   workMode: "remote" | "hybrid" | "onsite";
   appliedDate: string;
   source: string;
+  sourceName?: string;
   location?: string;
   salary?: string;
   recruiterName?: string;
@@ -161,6 +196,7 @@ type Application = {
   resumeUsed?: string;
   interviewDate?: string;
   followUpDate?: string;
+  rejectionDate?: string;
   notes?: string;
   archived: boolean;
   createdAt: string;
@@ -173,31 +209,14 @@ type Application = {
 
 ### Statuses
 
-`wishlist` · `ready_to_apply` · `applied` · `recruiter_call` · `assessment` · `technical_interview` · `hr_interview` · `final_interview` · `offer` · `joined` · `rejected` · `ghosted`
+`applied` · `recruiter_call` · `assessment` · `l1_interview` · `l2_interview` · `l3_interview` · `hr_interview` · `on_hold` · `rejected` · `ghosted` · `position_filled` · `offer` · `joined`
 
 ---
 
-## 💾 Data & Privacy
+## 💾 Data & Security
 
-- **100% local.** All data lives in your browser's `localStorage` under the key `jat.v1`.
-- No account, no server, no telemetry, no cloud sync.
-- Use **Settings → Export JSON** for backups, or move between browsers.
-
----
-
-## 🌗 Themes
-
-Toggle from **Settings → Appearance**. The choice persists across reloads and hot-reload cycles. Both themes ship with matching chart colors, borders, and elevation.
-
----
-
-## 🛣 Roadmap
-
-- [ ] Cloud sync (optional, opt-in)
-- [ ] Email/desktop reminders for follow-ups and interviews
-- [ ] Resume file uploads
-- [ ] CSV import
-- [ ] Public read-only share links for offer negotiations
+- **Supabase Cloud Sync & RLS**: Data is stored securely in Supabase PostgreSQL with strict Row Level Security rules, ensuring only the authenticated user can access their data.
+- **Local Fallback & Backup**: Supports local data persistence and **Settings → Export JSON** / **Import JSON** for data backups.
 
 ---
 

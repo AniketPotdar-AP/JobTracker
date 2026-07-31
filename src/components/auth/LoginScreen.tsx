@@ -69,9 +69,7 @@ export function LoginScreen() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30">
-            <Briefcase className="h-6 w-6" />
-          </div>
+          <img className="w-24 h-24" src="/jobtracker.png" alt="" />
           <h1 className="mt-4 text-2xl font-bold tracking-tight">JobTrack</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Your job applications, securely in the cloud</p>
         </div>
@@ -120,7 +118,7 @@ export function LoginScreen() {
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Aniket Potdar"
+                    placeholder="Full Name"
                     autoComplete="name"
                     className="h-12 text-base"
                     onKeyDown={(e) => { if (e.key === "Enter") void submit(e); }}

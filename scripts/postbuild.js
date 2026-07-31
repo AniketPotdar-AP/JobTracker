@@ -11,7 +11,9 @@ if (!fs.existsSync(indexPath)) {
 
 const files = fs.readdirSync(assetsDir);
 const jsFile = files.find((f) => f.startsWith("index-") && f.endsWith(".js"));
-const cssFile = files.find((f) => f.startsWith("styles-") && f.endsWith(".css"));
+const cssFile = files.find(
+  (f) => f.startsWith("styles-") && f.endsWith(".css"),
+);
 
 console.log("Found client bundle assets:", { jsFile, cssFile });
 
@@ -21,7 +23,7 @@ const htmlContent = `<!DOCTYPE html>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>JobTrack — Job Application Tracker</title>
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" href="/jobtracker.png" />
     ${cssFile ? `<link rel="stylesheet" href="/assets/${cssFile}" />` : ""}
   </head>
   <body>

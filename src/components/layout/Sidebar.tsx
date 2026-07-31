@@ -33,9 +33,7 @@ export function Sidebar() {
     <aside className="hidden md:flex md:w-60 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
       {/* Logo */}
       <div className="flex h-16 items-center gap-2.5 border-b px-5">
-        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground font-bold shadow-sm">
-          J
-        </div>
+        <img className="w-8 h-8" src="/jobtracker.png" alt="" />
         <div className="flex flex-col">
           <span className="text-sm font-semibold tracking-tight">JobTrack</span>
           <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Applications</span>

@@ -295,7 +295,7 @@ function Column({
     <div
       ref={setNodeRef}
       className={cn(
-        "group/col flex w-[85vw] max-w-[300px] sm:w-72 shrink-0 snap-center flex-col rounded-lg border bg-muted/30 transition-colors",
+        "group/col flex w-[85vw] max-w-75 sm:w-72 shrink-0 snap-center flex-col rounded-lg border bg-muted/30 transition-colors",
         isOver && "bg-primary/5 border-primary/40",
       )}
     >
