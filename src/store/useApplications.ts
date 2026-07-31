@@ -28,6 +28,7 @@ export type Application = {
   appliedDate: string;
   status: Status;
   source: string;
+  sourceName: string;
   recruiterName?: string;
   recruiterEmail?: string;
   jobUrl?: string;
@@ -72,6 +73,7 @@ function fromRow(r: Row): Application {
     appliedDate: (r.applied_date as string) ?? now(),
     status: ((r.status as Status) ?? "applied") as Status,
     source: (r.source as string) ?? "Other",
+    sourceName: (r.source_name as string) ?? undefined,
     recruiterName: (r.recruiter_name as string) ?? undefined,
     recruiterEmail: (r.recruiter_email as string) ?? undefined,
     jobUrl: (r.job_url as string) ?? undefined,
@@ -104,6 +106,7 @@ function toRow(patch: Partial<Application>): Row {
     appliedDate: "applied_date",
     status: "status",
     source: "source",
+    sourceName: "source_name",
     recruiterName: "recruiter_name",
     recruiterEmail: "recruiter_email",
     jobUrl: "job_url",

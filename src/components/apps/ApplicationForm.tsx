@@ -54,6 +54,7 @@ const emptyForm = {
     Record<Status, string>
   >,
   source: "LinkedIn",
+  sourceName: "",
   recruiterName: "",
   recruiterEmail: "",
   jobUrl: "",
@@ -121,6 +122,7 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
         status: fresh.status,
         statusDates: dates,
         source: fresh.source,
+        sourceName: fresh.sourceName,
         recruiterName: fresh.recruiterName ?? "",
         recruiterEmail: fresh.recruiterEmail ?? "",
         jobUrl: fresh.jobUrl ?? "",
@@ -202,6 +204,7 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
       appliedDate: appliedIso,
       status: form.status,
       source: form.source,
+      sourceName: form.source,
       recruiterName: form.recruiterName || undefined,
       recruiterEmail: form.recruiterEmail || undefined,
       jobUrl: form.jobUrl || undefined,
@@ -331,6 +334,18 @@ export function ApplicationForm({ open, onOpenChange, editing }: Props) {
                   </SelectContent>
                 </Select>
               </Field>
+
+              {
+                form.source == 'Other' ? (
+                  <Field label="Source name">
+                    <Input
+                      value={form.sourceName}
+                      onChange={(e) => set("sourceName", e.target.value)}
+                      className="h-11 text-base sm:text-sm"
+                    />
+                  </Field>
+                ) : ''
+              }
 
               {/* Render separate date field for each active or previous status */}
               {STATUS_ORDER.filter(
