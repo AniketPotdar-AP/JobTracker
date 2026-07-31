@@ -69,7 +69,14 @@ function SortableStatusRow({ status }: { status: Status }) {
 }
 
 import { StatusDateModal } from "@/components/apps/StatusDateModal";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
   const setStatus = useApplicationsStore((s) => s.setStatus);
@@ -177,11 +184,11 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
           {visibleStatuses.length} of {STATUS_ORDER.length} columns shown
         </p>
         <div className="flex items-center gap-2">
-          {(hidden.length > 0 || order.join() !== STATUS_ORDER.join()) && (
+          {/* {(hidden.length > 0 || order.join() !== STATUS_ORDER.join()) && (
             <Button variant="ghost" size="sm" onClick={resetColumns}>
               Reset
             </Button>
-          )}
+          )} */}
 
           <Popover>
             <PopoverTrigger asChild>
@@ -211,7 +218,7 @@ export function KanbanBoard({ applications, onEdit, onDelete }: Props) {
                 <SlidersHorizontal className="h-4 w-4" /> Columns
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="max-h-80 overflow-y-auto">
+            <DropdownMenuContent align="end" className="w-52 max-h-80 overflow-y-auto">
               <DropdownMenuLabel>Visible columns</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {order.map((s) => (

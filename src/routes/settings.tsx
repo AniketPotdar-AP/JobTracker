@@ -121,9 +121,9 @@ function SettingsPage() {
                   e.target.value = "";
                 }}
               />
-              <Button variant="outline" size="sm" className="text-destructive" onClick={() => setConfirmClear(true)}>
+              {/* <Button variant="outline" size="sm" className="text-destructive" onClick={() => setConfirmClear(true)}>
                 <Trash2 className="h-4 w-4" /> Clear all
-              </Button>
+              </Button> */}
             </div>
           </CardContent>
         </Card>
