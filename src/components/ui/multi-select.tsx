@@ -19,7 +19,8 @@ export interface Option {
 
 export interface MultiSelectProps {
   options: Option[];
-  value: string[];
+  value?: string[];
+  selected?: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
   allLabel?: string;
@@ -28,14 +29,16 @@ export interface MultiSelectProps {
 }
 
 export function MultiSelect({
-  options,
-  value,
+  options = [],
+  value: valueProp,
+  selected,
   onChange,
   placeholder = "Select items...",
   allLabel = "All selected",
   className,
   showSearch = false,
 }: MultiSelectProps) {
+  const value = React.useMemo(() => valueProp ?? selected ?? [], [valueProp, selected]);
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
 

@@ -14,6 +14,10 @@ import { Route as AnalyticsRouteImport } from "./routes/analytics";
 import { Route as ApplicationsRouteImport } from "./routes/applications";
 import { Route as CalendarRouteImport } from "./routes/calendar";
 import { Route as SettingsRouteImport } from "./routes/settings";
+import { Route as InterviewsRouteImport } from "./routes/interviews";
+import { Route as QuestionsRouteImport } from "./routes/questions";
+import { Route as InterviewsIdRouteImport } from "./routes/interviews.$id";
+import { Route as QuestionsIdRouteImport } from "./routes/questions.$id";
 import { Route as ApplicationsIndexRouteImport } from "./routes/applications.index";
 import { Route as ApplicationsIdRouteImport } from "./routes/applications.$id";
 
@@ -42,6 +46,26 @@ const SettingsRoute = SettingsRouteImport.update({
   path: "/settings",
   getParentRoute: () => rootRouteImport,
 } as any);
+const InterviewsRoute = InterviewsRouteImport.update({
+  id: "/interviews",
+  path: "/interviews",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const QuestionsRoute = QuestionsRouteImport.update({
+  id: "/questions",
+  path: "/questions",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const InterviewsIdRoute = InterviewsIdRouteImport.update({
+  id: "/interviews/$id",
+  path: "/interviews/$id",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const QuestionsIdRoute = QuestionsIdRouteImport.update({
+  id: "/questions/$id",
+  path: "/questions/$id",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const ApplicationsIndexRoute = ApplicationsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -57,6 +81,10 @@ export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
   "/analytics": typeof AnalyticsRoute;
   "/applications": typeof ApplicationsRouteWithChildren;
+  "/interviews": typeof InterviewsRoute;
+  "/questions": typeof QuestionsRoute;
+  "/interviews/$id": typeof InterviewsIdRoute;
+  "/questions/$id": typeof QuestionsIdRoute;
   "/calendar": typeof CalendarRoute;
   "/settings": typeof SettingsRoute;
   "/applications/$id": typeof ApplicationsIdRoute;
@@ -65,6 +93,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/analytics": typeof AnalyticsRoute;
+  "/interviews": typeof InterviewsRoute;
+  "/questions": typeof QuestionsRoute;
+  "/interviews/$id": typeof InterviewsIdRoute;
+  "/questions/$id": typeof QuestionsIdRoute;
   "/calendar": typeof CalendarRoute;
   "/settings": typeof SettingsRoute;
   "/applications/$id": typeof ApplicationsIdRoute;
@@ -75,6 +107,10 @@ export interface FileRoutesById {
   "/": typeof IndexRoute;
   "/analytics": typeof AnalyticsRoute;
   "/applications": typeof ApplicationsRouteWithChildren;
+  "/interviews": typeof InterviewsRoute;
+  "/questions": typeof QuestionsRoute;
+  "/interviews/$id": typeof InterviewsIdRoute;
+  "/questions/$id": typeof QuestionsIdRoute;
   "/calendar": typeof CalendarRoute;
   "/settings": typeof SettingsRoute;
   "/applications/$id": typeof ApplicationsIdRoute;
@@ -86,6 +122,10 @@ export interface FileRouteTypes {
     | "/"
     | "/analytics"
     | "/applications"
+    | "/interviews"
+    | "/questions"
+    | "/interviews/$id"
+    | "/questions/$id"
     | "/calendar"
     | "/settings"
     | "/applications/$id"
@@ -94,6 +134,10 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/analytics"
+    | "/interviews"
+    | "/questions"
+    | "/interviews/$id"
+    | "/questions/$id"
     | "/calendar"
     | "/settings"
     | "/applications/$id"
@@ -103,6 +147,10 @@ export interface FileRouteTypes {
     | "/"
     | "/analytics"
     | "/applications"
+    | "/interviews"
+    | "/questions"
+    | "/interviews/$id"
+    | "/questions/$id"
     | "/calendar"
     | "/settings"
     | "/applications/$id"
@@ -113,6 +161,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   AnalyticsRoute: typeof AnalyticsRoute;
   ApplicationsRoute: typeof ApplicationsRouteWithChildren;
+  InterviewsRoute: typeof InterviewsRoute;
+  QuestionsRoute: typeof QuestionsRoute;
+  InterviewsIdRoute: typeof InterviewsIdRoute;
+  QuestionsIdRoute: typeof QuestionsIdRoute;
   CalendarRoute: typeof CalendarRoute;
   SettingsRoute: typeof SettingsRoute;
 }
@@ -138,6 +190,34 @@ declare module "@tanstack/react-router" {
       path: "/applications";
       fullPath: "/applications";
       preLoaderRoute: typeof ApplicationsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/interviews": {
+      id: "/interviews";
+      path: "/interviews";
+      fullPath: "/interviews";
+      preLoaderRoute: typeof InterviewsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/questions": {
+      id: "/questions";
+      path: "/questions";
+      fullPath: "/questions";
+      preLoaderRoute: typeof QuestionsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/interviews/$id": {
+      id: "/interviews/$id";
+      path: "/interviews/$id";
+      fullPath: "/interviews/$id";
+      preLoaderRoute: typeof InterviewsIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/questions/$id": {
+      id: "/questions/$id";
+      path: "/questions/$id";
+      fullPath: "/questions/$id";
+      preLoaderRoute: typeof QuestionsIdRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/calendar": {
@@ -189,6 +269,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyticsRoute: AnalyticsRoute,
   ApplicationsRoute: ApplicationsRouteWithChildren,
+  InterviewsRoute: InterviewsRoute,
+  QuestionsRoute: QuestionsRoute,
+  InterviewsIdRoute: InterviewsIdRoute,
+  QuestionsIdRoute: QuestionsIdRoute,
   CalendarRoute: CalendarRoute,
   SettingsRoute: SettingsRoute,
 };

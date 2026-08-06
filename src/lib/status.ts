@@ -1,6 +1,7 @@
 export type Status =
   | "applied"
   | "recruiter_call"
+  | "screening_round"
   | "assessment"
   | "l1_interview"
   | "l2_interview"
@@ -16,6 +17,7 @@ export type Status =
 export const STATUS_ORDER: Status[] = [
   "applied",
   "recruiter_call",
+  "screening_round",
   "assessment",
   "l1_interview",
   "l2_interview",
@@ -32,6 +34,7 @@ export const STATUS_ORDER: Status[] = [
 export const STATUS_LABEL: Record<Status, string> = {
   applied: "Applied",
   recruiter_call: "Recruiter call",
+  screening_round: "Screening Round",
   assessment: "Assesment",
   l1_interview: "L1 Interview",
   l2_interview: "L2 Interview",
@@ -51,6 +54,8 @@ export const STATUS_CLASS: Record<Status, string> = {
     "bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300 border-blue-200/60 dark:border-blue-500/20",
   recruiter_call:
     "bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-500/20",
+  screening_round:
+    "bg-teal-100 text-teal-800 dark:bg-teal-500/15 dark:text-teal-300 border-teal-200/60 dark:border-teal-500/20",
   assessment:
     "bg-cyan-100 text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-300 border-cyan-200/60 dark:border-cyan-500/20",
   l1_interview:
@@ -76,6 +81,7 @@ export const STATUS_CLASS: Record<Status, string> = {
 };
 
 export const ACTUAL_INTERVIEW_STATUSES: Status[] = [
+  "screening_round",
   "assessment",
   "l1_interview",
   "l2_interview",
@@ -84,7 +90,6 @@ export const ACTUAL_INTERVIEW_STATUSES: Status[] = [
 ];
 
 export const INTERVIEW_STATUSES: Status[] = [
-  "recruiter_call",
   ...ACTUAL_INTERVIEW_STATUSES,
 ];
 

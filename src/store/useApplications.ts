@@ -11,6 +11,7 @@ import {
 } from "@/lib/status";
 import { readLocal, storageKeys, writeLocal } from "@/lib/local-store";
 import { supabase } from "@/integrations/supabase/client";
+import { useInterviewsStore } from "@/store/useInterviews";
 
 export type Interview = {
   id: string;
@@ -216,6 +217,7 @@ export const useApplicationsStore = create<State>()((set, get) => {
       const apps = ((data as unknown as Row[]) ?? []).map(fromRow);
       writeLocal(`jat.apps.${userId}`, apps);
       set({ applications: apps });
+      useInterviewsStore.getState().syncFromApplications(apps);
     } catch (e) {
       console.error("Failed to refresh applications:", e);
     }
@@ -238,6 +240,7 @@ export const useApplicationsStore = create<State>()((set, get) => {
           hasHydrated: true,
           loading: false,
         });
+        useInterviewsStore.getState().syncFromApplications(cached);
       } else {
         set({ userId, loading: true, hasHydrated: true });
       }
@@ -295,6 +298,7 @@ export const useApplicationsStore = create<State>()((set, get) => {
       const apps = [app, ...get().applications];
       if (userId) writeLocal(`jat.apps.${userId}`, apps);
       set({ applications: apps });
+      useInterviewsStore.getState().syncFromApplications(apps);
       return app;
     },
 
@@ -326,6 +330,7 @@ export const useApplicationsStore = create<State>()((set, get) => {
       const userId = get().userId;
       if (userId) writeLocal(`jat.apps.${userId}`, apps);
       set({ applications: apps });
+      useInterviewsStore.getState().syncFromApplications(apps);
       const { error } = await table()
         .update(toRow(next) as never)
         .eq("id", id);

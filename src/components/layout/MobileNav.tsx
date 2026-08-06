@@ -2,6 +2,8 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Briefcase,
+  Video,
+  HelpCircle,
   CalendarDays,
   BarChart3,
   Settings as SettingsIcon,
@@ -11,6 +13,8 @@ import { cn } from "@/lib/utils";
 const items = [
   { to: "/", label: "Home", icon: LayoutDashboard, exact: true },
   { to: "/applications", label: "Apps", icon: Briefcase },
+  { to: "/interviews", label: "Interviews", icon: Video },
+  { to: "/questions", label: "Questions", icon: HelpCircle },
   { to: "/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/analytics", label: "Stats", icon: BarChart3 },
   { to: "/settings", label: "Settings", icon: SettingsIcon },
@@ -23,7 +27,7 @@ export function MobileNav() {
       className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur-lg"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="grid grid-cols-5 px-1">
+      <ul className="flex items-center justify-between overflow-x-auto px-1 scrollbar-none">
         {items.map((it) => {
           const active = it.exact
             ? pathname === it.to

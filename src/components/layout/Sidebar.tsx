@@ -2,6 +2,8 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Briefcase,
+  Video,
+  HelpCircle,
   CalendarDays,
   BarChart3,
   Settings as SettingsIcon,
@@ -17,6 +19,8 @@ import { useAuthStore } from "@/store/useAuth";
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/applications", label: "Applications", icon: Briefcase },
+  { to: "/interviews", label: "Interviews", icon: Video },
+  { to: "/questions", label: "Questions", icon: HelpCircle },
   { to: "/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/settings", label: "Settings", icon: SettingsIcon },

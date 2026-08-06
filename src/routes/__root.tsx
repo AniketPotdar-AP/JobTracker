@@ -11,6 +11,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { Toaster } from "@/components/ui/sonner";
 import { useApplicationsStore } from "@/store/useApplications";
+import { useInterviewsStore } from "@/store/useInterviews";
 import { useAuthStore } from "@/store/useAuth";
 import { LoginScreen } from "@/components/auth/LoginScreen";
 import { purgeLegacyData } from "@/lib/local-store";
@@ -125,9 +126,11 @@ function AppShell() {
       if (loadedUserId.current === userId) return; // already loaded for this user
       loadedUserId.current = userId;
       void useApplicationsStore.getState().loadUser(userId);
+      useInterviewsStore.getState().loadUser(userId);
     } else {
       loadedUserId.current = null;
       useApplicationsStore.getState().unloadUser();
+      useInterviewsStore.getState().unloadUser();
     }
   }, [userId]);
 

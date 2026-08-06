@@ -45,6 +45,7 @@ export const Route = createFileRoute("/analytics")({
 const STATUS_COLORS: Partial<Record<Status, string>> = {
   applied: "#3b82f6",
   recruiter_call: "#6366f1",
+  screening_round: "#14b8a6",
   assessment: "#06b6d4",
   l1_interview: "#8b5cf6",
   l2_interview: "#a855f7",
