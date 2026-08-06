@@ -370,10 +370,8 @@ function QuestionsPage() {
                   <TableHead>Type</TableHead>
                   <TableHead>Language</TableHead>
                   <TableHead>Topic</TableHead>
-                  <TableHead>Company</TableHead>
                   <TableHead>Difficulty</TableHead>
                   <TableHead className="text-center">Count</TableHead>
-                  <TableHead>Date</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -381,17 +379,27 @@ function QuestionsPage() {
                 {sortedQuestions.map((q) => (
                   <TableRow key={q.id}>
                     <TableCell className="font-medium max-w-sm">
-                      <Link to="/questions/$id" params={{ id: q.id }} className="hover:text-primary">{q.question}</Link>
+                      <p className="w-[90%]">{q.question}</p>
                     </TableCell>
                     <TableCell><Badge variant="outline" className={QUESTION_TYPE_CLASSES[q.type]}>{QUESTION_TYPE_LABELS[q.type]}</Badge></TableCell>
                     <TableCell><Badge variant="secondary">{q.language}</Badge></TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{q.subLanguage}</TableCell>
-                    <TableCell className="text-xs">{q.company || "—"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      <div className="flex flex-wrap gap-1">
+                        {q.subLanguage
+                          ?.split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean)
+                          .map((sub, idx) => (
+                            <Badge key={idx} variant="outline" className="text-[10px] py-0 font-normal">
+                              {sub}
+                            </Badge>
+                          ))}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       {q.difficulty && <Badge className={difficultyColors[q.difficulty]}>{q.difficulty}</Badge>}
                     </TableCell>
                     <TableCell className="text-center"><Badge variant="secondary">{q.askedCount || 1}</Badge></TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatNiceDate(q.dateAdded)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button

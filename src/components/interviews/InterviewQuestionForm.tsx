@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { SearchableSelect, type Option } from "@/components/ui/searchable-select";
+import { SearchableMultiSelect, type MultiOption } from "@/components/ui/searchable-multi-select";
 import type { QuestionItem, QuestionType, Difficulty, MCQOption } from "@/types/interviews";
 import { PRESET_LANGUAGES, PRESET_SUB_LANGUAGES } from "@/types/interviews";
 import { useInterviewsStore } from "@/store/useInterviews";
@@ -23,7 +24,7 @@ export function InterviewQuestionForm({ onAddQuestion }: InterviewQuestionFormPr
   const [question, setQuestion] = useState("");
   const [type, setType] = useState<QuestionType | "">("");
   const [language, setLanguage] = useState("");
-  const [subLanguage, setSubLanguage] = useState("");
+  const [subLanguages, setSubLanguages] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty | "">("");
   const [answer, setAnswer] = useState("");
   const [codeSnippet, setCodeSnippet] = useState("");
@@ -40,7 +41,7 @@ export function InterviewQuestionForm({ onAddQuestion }: InterviewQuestionFormPr
     return PRESET_LANGUAGES.map((l) => ({ label: l, value: l }));
   }, []);
 
-  const subLanguageOptions = useMemo<Option[]>(() => {
+  const subLanguageOptions = useMemo<MultiOption[]>(() => {
     return PRESET_SUB_LANGUAGES.map((s) => ({ label: s, value: s }));
   }, []);
 
@@ -71,7 +72,7 @@ export function InterviewQuestionForm({ onAddQuestion }: InterviewQuestionFormPr
     setQuestion("");
     setType("");
     setLanguage("");
-    setSubLanguage("");
+    setSubLanguages([]);
     setDifficulty("");
     setAnswer("");
     setCodeSnippet("");
@@ -83,7 +84,10 @@ export function InterviewQuestionForm({ onAddQuestion }: InterviewQuestionFormPr
     setQuestion(suggested.question);
     setType(suggested.type);
     setLanguage(suggested.language || "");
-    setSubLanguage(suggested.subLanguage || "");
+    const parsedSubs = suggested.subLanguage
+      ? suggested.subLanguage.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
+    setSubLanguages(parsedSubs);
     if (suggested.difficulty) setDifficulty(suggested.difficulty);
     if (suggested.answer) setAnswer(suggested.answer);
     if (suggested.codeSnippet) setCodeSnippet(suggested.codeSnippet);
@@ -125,7 +129,7 @@ export function InterviewQuestionForm({ onAddQuestion }: InterviewQuestionFormPr
       question: question.trim(),
       type: type as QuestionType,
       language: language.trim(),
-      subLanguage: subLanguage.trim() || "",
+      subLanguage: subLanguages.join(", "),
       difficulty: (difficulty as Difficulty) || undefined,
       answer: answer.trim() || undefined,
       codeSnippet: type === "practical" ? codeSnippet.trim() || undefined : undefined,
@@ -256,12 +260,12 @@ export function InterviewQuestionForm({ onAddQuestion }: InterviewQuestionFormPr
         </div>
 
         <div className="space-y-1">
-          <Label className="text-xs">Sub Lang / Topic Category (Optional)</Label>
-          <SearchableSelect
+          <Label className="text-xs">Sub Lang / Topic Categories</Label>
+          <SearchableMultiSelect
             options={subLanguageOptions}
-            value={subLanguage}
-            onChange={(v) => setSubLanguage(v)}
-            placeholder="Search or type category"
+            values={subLanguages}
+            onChange={(v) => setSubLanguages(v)}
+            placeholder="Select topics..."
             searchPlaceholder="Search or type topic..."
             allowCustom={true}
           />

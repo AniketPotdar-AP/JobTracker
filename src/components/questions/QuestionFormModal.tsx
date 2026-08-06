@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { SearchableSelect, type Option } from "@/components/ui/searchable-select";
+import { SearchableMultiSelect, type MultiOption } from "@/components/ui/searchable-multi-select";
 import type { MCQOption, QuestionItem, QuestionType, Difficulty } from "@/types/interviews";
 import { PRESET_LANGUAGES, PRESET_SUB_LANGUAGES } from "@/types/interviews";
 import { useInterviewsStore } from "@/store/useInterviews";
@@ -24,6 +25,7 @@ type QuestionFormModalProps = {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: Omit<QuestionItem, "id" | "dateAdded">) => void;
   editingQuestion?: QuestionItem | null;
+  defaultCompany?: string;
 };
 
 export function QuestionFormModal({
@@ -31,6 +33,7 @@ export function QuestionFormModal({
   onOpenChange,
   onSubmit,
   editingQuestion,
+  defaultCompany,
 }: QuestionFormModalProps) {
   const getAllQuestions = useInterviewsStore((s) => s.getAllQuestions);
   const applications = useApplicationsStore((s) => s.applications);
@@ -39,8 +42,8 @@ export function QuestionFormModal({
   const [question, setQuestion] = useState("");
   const [type, setType] = useState<QuestionType | "">("");
   const [language, setLanguage] = useState("");
-  const [subLanguage, setSubLanguage] = useState("");
-  const [company, setCompany] = useState("");
+  const [subLanguages, setSubLanguages] = useState<string[]>([]);
+  const [company, setCompany] = useState(defaultCompany || "");
   const [difficulty, setDifficulty] = useState<Difficulty | "">("");
   const [answer, setAnswer] = useState("");
   const [codeSnippet, setCodeSnippet] = useState("");
@@ -66,14 +69,15 @@ export function QuestionFormModal({
     const set = new Set<string>();
     applications.forEach((a) => { if (a.company) set.add(a.company.trim()); });
     existingQuestions.forEach((q) => { if (q.company) set.add(q.company.trim()); });
+    if (defaultCompany) set.add(defaultCompany.trim());
     return Array.from(set).map((c) => ({ label: c, value: c }));
-  }, [applications, existingQuestions]);
+  }, [applications, existingQuestions, defaultCompany]);
 
   const languageOptions = useMemo<Option[]>(() => {
     return PRESET_LANGUAGES.map((l) => ({ label: l, value: l }));
   }, []);
 
-  const subLanguageOptions = useMemo<Option[]>(() => {
+  const subLanguageOptions = useMemo<MultiOption[]>(() => {
     return PRESET_SUB_LANGUAGES.map((s) => ({ label: s, value: s }));
   }, []);
 
@@ -95,8 +99,11 @@ export function QuestionFormModal({
       setQuestion(editingQuestion.question || "");
       setType(editingQuestion.type || "theoretical");
       setLanguage(editingQuestion.language || "");
-      setSubLanguage(editingQuestion.subLanguage || "");
-      setCompany(editingQuestion.company || "");
+      const parsedSubs = editingQuestion.subLanguage
+        ? editingQuestion.subLanguage.split(",").map((s) => s.trim()).filter(Boolean)
+        : [];
+      setSubLanguages(parsedSubs);
+      setCompany(editingQuestion.company || defaultCompany || "");
       setDifficulty(editingQuestion.difficulty || "");
       setAnswer(editingQuestion.answer || "");
       setCodeSnippet(editingQuestion.codeSnippet || "");
@@ -109,8 +116,8 @@ export function QuestionFormModal({
       setQuestion("");
       setType("");
       setLanguage("");
-      setSubLanguage("");
-      setCompany("");
+      setSubLanguages([]);
+      setCompany(defaultCompany || "");
       setDifficulty("");
       setAnswer("");
       setCodeSnippet("");
@@ -123,13 +130,16 @@ export function QuestionFormModal({
       setCorrectOptionId("opt-a");
     }
     setShowSuggestions(false);
-  }, [editingQuestion, open]);
+  }, [editingQuestion, open, defaultCompany]);
 
   const handleSelectSuggestion = (suggested: QuestionItem) => {
     setQuestion(suggested.question);
     setType(suggested.type);
     setLanguage(suggested.language || "");
-    setSubLanguage(suggested.subLanguage || "");
+    const parsedSubs = suggested.subLanguage
+      ? suggested.subLanguage.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
+    setSubLanguages(parsedSubs);
     if (suggested.difficulty) setDifficulty(suggested.difficulty);
     if (suggested.answer) setAnswer(suggested.answer);
     if (suggested.codeSnippet) setCodeSnippet(suggested.codeSnippet);
@@ -175,7 +185,7 @@ export function QuestionFormModal({
       question: question.trim(),
       type: type as QuestionType,
       language: language.trim(),
-      subLanguage: subLanguage.trim() || "",
+      subLanguage: subLanguages.join(", "),
       company: company.trim() || undefined,
       difficulty: (difficulty as Difficulty) || undefined,
       answer: answer.trim() || undefined,
@@ -292,12 +302,12 @@ export function QuestionFormModal({
               </div>
 
               <div className="space-y-2">
-                <Label className="font-semibold text-xs">Sub Lang / Topic Category</Label>
-                <SearchableSelect
+                <Label className="font-semibold text-xs">Sub Lang / Topic Categories</Label>
+                <SearchableMultiSelect
                   options={subLanguageOptions}
-                  value={subLanguage}
-                  onChange={(v) => setSubLanguage(v)}
-                  placeholder="Select Category (Optional)"
+                  values={subLanguages}
+                  onChange={(v) => setSubLanguages(v)}
+                  placeholder="Select topics/categories..."
                   searchPlaceholder="Search or type topic category..."
                   allowCustom={true}
                 />

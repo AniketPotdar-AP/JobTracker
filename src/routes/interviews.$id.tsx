@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   ArrowLeft,
   Pencil,
@@ -65,6 +65,7 @@ function InterviewDetailsPage() {
   const interview = useInterviewsStore((s) =>
     s.interviews.find((i) => i.id === id),
   );
+  const standaloneQuestions = useInterviewsStore((s) => s.standaloneQuestions);
   const updateInterview = useInterviewsStore((s) => s.updateInterview);
   const deleteInterview = useInterviewsStore((s) => s.deleteInterview);
   const addQuestionToInterview = useInterviewsStore((s) => s.addQuestionToInterview);
@@ -76,6 +77,31 @@ function InterviewDetailsPage() {
 
   const [addQuestionOpen, setAddQuestionOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<QuestionItem | null>(null);
+
+  const displayQuestions = useMemo(() => {
+    if (!interview) return [];
+    const direct = interview.questions || [];
+    const directIds = new Set(direct.map((q) => q.id));
+    const directTexts = new Set(direct.map((q) => q.question.trim().toLowerCase()));
+
+    const matchingStandalone = standaloneQuestions.filter(
+      (q) =>
+        q.interviewId === interview.id ||
+        (q.company &&
+          q.company.trim().toLowerCase() === interview.company.trim().toLowerCase()),
+    );
+
+    const result = [...direct];
+    for (const sq of matchingStandalone) {
+      if (
+        !directIds.has(sq.id) &&
+        !directTexts.has(sq.question.trim().toLowerCase())
+      ) {
+        result.push(sq);
+      }
+    }
+    return result;
+  }, [interview, standaloneQuestions]);
 
   if (!interview) {
     return (
@@ -146,13 +172,6 @@ function InterviewDetailsPage() {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2 shrink-0">
-          <Button
-            onClick={() => setAddQuestionOpen(true)}
-            size="sm"
-            className="gap-1.5 shadow-sm"
-          >
-            <Plus className="h-4 w-4" /> Add Question
-          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -249,20 +268,20 @@ function InterviewDetailsPage() {
             <div className="flex items-center gap-2">
               <FileQuestion className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-bold">
-                Questions Asked ({interview.questions.length})
+                Questions Asked ({displayQuestions.length})
               </h2>
             </div>
             <Button
               variant="outline"
               size="sm"
-              className="gap-1 text-xs"
+              className="gap-1 text-xs bg-primary text-white"
               onClick={() => setAddQuestionOpen(true)}
             >
               <Plus className="h-3.5 w-3.5" /> Add Question
             </Button>
           </div>
 
-          {interview.questions.length === 0 ? (
+          {displayQuestions.length === 0 ? (
             <Card className="p-8 text-center border-dashed">
               <FileQuestion className="h-10 w-10 mx-auto text-muted-foreground/40 mb-2" />
               <h3 className="text-sm font-semibold">No questions added yet</h3>
@@ -279,7 +298,7 @@ function InterviewDetailsPage() {
             </Card>
           ) : (
             <div className="grid gap-4">
-              {interview.questions.map((q) => (
+              {displayQuestions.map((q) => (
                 <QuestionCard
                   key={q.id}
                   question={q}
@@ -307,6 +326,7 @@ function InterviewDetailsPage() {
       <QuestionFormModal
         open={addQuestionOpen}
         onOpenChange={setAddQuestionOpen}
+        defaultCompany={interview.company}
         onSubmit={(qData) => {
           addQuestionToInterview(interview.id, qData);
           setAddQuestionOpen(false);

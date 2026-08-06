@@ -78,10 +78,16 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
               {question.language}
             </Badge>
 
-            {/* Sub language / Category Tag */}
-            <Badge variant="outline" className="text-xs bg-muted/50 border-muted-foreground/20">
-              {question.subLanguage}
-            </Badge>
+            {/* Sub language / Category Tags */}
+            {question.subLanguage
+              ?.split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+              .map((sub, idx) => (
+                <Badge key={idx} variant="outline" className="text-xs bg-muted/50 border-muted-foreground/20">
+                  {sub}
+                </Badge>
+              ))}
 
             {/* Difficulty Badge if set */}
             {question.difficulty && (
@@ -140,7 +146,7 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
         </div>
 
         {/* Company & Context Meta */}
-        {(question.company || question.roundType || question.dateAdded) && (
+        {/* {(question.company || question.roundType || question.dateAdded) && (
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground pt-0.5">
             {question.company && (
               <span className="flex items-center gap-1 font-medium text-foreground/80">
@@ -160,7 +166,7 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
               </span>
             )}
           </div>
-        )}
+        )} */}
 
         {/* Question Title Statement */}
         <h3 className="text-base font-semibold text-foreground leading-snug pt-1">

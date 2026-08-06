@@ -93,9 +93,7 @@ function DashboardPage() {
     const offer = apps.filter(
       (a) => a.status === "offer" || a.status === "joined",
     ).length;
-    const rejected = apps.filter(
-      (a) => a.status === "rejected" || a.status === "ghosted",
-    ).length;
+    const rejected = apps.filter((a) => a.status === "rejected").length;
     return { total, applied, inProgress, interview, offer, rejected };
   }, [apps]);
 

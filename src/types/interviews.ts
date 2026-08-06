@@ -65,6 +65,7 @@ export const QUESTION_TYPE_CLASSES: Record<QuestionType, string> = {
 
 /** Standard presets for Languages & Frameworks (Frontend, Backend, Styling, Databases, Languages) */
 export const PRESET_LANGUAGES = [
+  "Personal",
   "React",
   "Angular",
   "Node.js",
