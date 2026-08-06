@@ -37,7 +37,7 @@ export function MobileNav() {
               <Link
                 to={it.to}
                 className={cn(
-                  "flex flex-col items-center gap-1 py-2.5 px-1 relative min-h-[56px] justify-center w-full",
+                  "flex flex-col items-center gap-1 py-2.5 px-1 relative min-h-14 justify-center w-full",
                   active ? "text-primary" : "text-muted-foreground",
                 )}
               >

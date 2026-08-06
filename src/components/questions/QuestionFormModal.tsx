@@ -1,26 +1,22 @@
-import { useEffect, useState } from "react";
-import { Plus, Trash2, HelpCircle } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { Plus, HelpCircle, Sparkles, Building2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { SearchableSelect, type Option } from "@/components/ui/searchable-select";
 import type { MCQOption, QuestionItem, QuestionType, Difficulty } from "@/types/interviews";
 import { PRESET_LANGUAGES, PRESET_SUB_LANGUAGES } from "@/types/interviews";
+import { useInterviewsStore } from "@/store/useInterviews";
+import { useApplicationsStore } from "@/store/useApplications";
 import { nanoid } from "nanoid";
 
 type QuestionFormModalProps = {
@@ -36,14 +32,16 @@ export function QuestionFormModal({
   onSubmit,
   editingQuestion,
 }: QuestionFormModalProps) {
+  const getAllQuestions = useInterviewsStore((s) => s.getAllQuestions);
+  const applications = useApplicationsStore((s) => s.applications);
+  const existingQuestions = useMemo(() => getAllQuestions(), [getAllQuestions, open]);
+
   const [question, setQuestion] = useState("");
-  const [type, setType] = useState<QuestionType>("theoretical");
-  const [language, setLanguage] = useState("React");
-  const [customLanguage, setCustomLanguage] = useState("");
-  const [subLanguage, setSubLanguage] = useState("Arrays");
-  const [customSubLanguage, setCustomSubLanguage] = useState("");
+  const [type, setType] = useState<QuestionType | "">("");
+  const [language, setLanguage] = useState("");
+  const [subLanguage, setSubLanguage] = useState("");
   const [company, setCompany] = useState("");
-  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
+  const [difficulty, setDifficulty] = useState<Difficulty | "">("");
   const [answer, setAnswer] = useState("");
   const [codeSnippet, setCodeSnippet] = useState("");
   const [mcqOptions, setMcqOptions] = useState<MCQOption[]>([
@@ -54,29 +52,52 @@ export function QuestionFormModal({
   ]);
   const [correctOptionId, setCorrectOptionId] = useState("opt-a");
 
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const suggestions = useMemo(() => {
+    if (!question.trim() || question.trim().length < 2 || editingQuestion) return [];
+    const q = question.toLowerCase();
+    return existingQuestions
+      .filter((item) => item.question.toLowerCase().includes(q))
+      .slice(0, 5);
+  }, [question, existingQuestions, editingQuestion]);
+
+  const companyOptions = useMemo<Option[]>(() => {
+    const set = new Set<string>();
+    applications.forEach((a) => { if (a.company) set.add(a.company.trim()); });
+    existingQuestions.forEach((q) => { if (q.company) set.add(q.company.trim()); });
+    return Array.from(set).map((c) => ({ label: c, value: c }));
+  }, [applications, existingQuestions]);
+
+  const languageOptions = useMemo<Option[]>(() => {
+    return PRESET_LANGUAGES.map((l) => ({ label: l, value: l }));
+  }, []);
+
+  const subLanguageOptions = useMemo<Option[]>(() => {
+    return PRESET_SUB_LANGUAGES.map((s) => ({ label: s, value: s }));
+  }, []);
+
+  const questionTypeOptions: Option[] = [
+    { label: "Theoretical", value: "theoretical" },
+    { label: "Practical / Coding", value: "practical" },
+    { label: "Scenario Based", value: "scenario" },
+    { label: "MCQ Based", value: "mcq" },
+  ];
+
+  const difficultyOptions: Option[] = [
+    { label: "Easy", value: "easy" },
+    { label: "Medium", value: "medium" },
+    { label: "Hard", value: "hard" },
+  ];
+
   useEffect(() => {
     if (editingQuestion) {
       setQuestion(editingQuestion.question || "");
       setType(editingQuestion.type || "theoretical");
-      
-      if (PRESET_LANGUAGES.includes(editingQuestion.language)) {
-        setLanguage(editingQuestion.language);
-        setCustomLanguage("");
-      } else {
-        setLanguage("custom");
-        setCustomLanguage(editingQuestion.language || "");
-      }
-
-      if (PRESET_SUB_LANGUAGES.includes(editingQuestion.subLanguage)) {
-        setSubLanguage(editingQuestion.subLanguage);
-        setCustomSubLanguage("");
-      } else {
-        setSubLanguage("custom");
-        setCustomSubLanguage(editingQuestion.subLanguage || "");
-      }
-
+      setLanguage(editingQuestion.language || "");
+      setSubLanguage(editingQuestion.subLanguage || "");
       setCompany(editingQuestion.company || "");
-      setDifficulty(editingQuestion.difficulty || "medium");
+      setDifficulty(editingQuestion.difficulty || "");
       setAnswer(editingQuestion.answer || "");
       setCodeSnippet(editingQuestion.codeSnippet || "");
       if (editingQuestion.options && editingQuestion.options.length > 0) {
@@ -86,13 +107,11 @@ export function QuestionFormModal({
       }
     } else {
       setQuestion("");
-      setType("theoretical");
-      setLanguage("React");
-      setCustomLanguage("");
-      setSubLanguage("Arrays");
-      setCustomSubLanguage("");
+      setType("");
+      setLanguage("");
+      setSubLanguage("");
       setCompany("");
-      setDifficulty("medium");
+      setDifficulty("");
       setAnswer("");
       setCodeSnippet("");
       setMcqOptions([
@@ -103,7 +122,22 @@ export function QuestionFormModal({
       ]);
       setCorrectOptionId("opt-a");
     }
+    setShowSuggestions(false);
   }, [editingQuestion, open]);
+
+  const handleSelectSuggestion = (suggested: QuestionItem) => {
+    setQuestion(suggested.question);
+    setType(suggested.type);
+    setLanguage(suggested.language || "");
+    setSubLanguage(suggested.subLanguage || "");
+    if (suggested.difficulty) setDifficulty(suggested.difficulty);
+    if (suggested.answer) setAnswer(suggested.answer);
+    if (suggested.codeSnippet) setCodeSnippet(suggested.codeSnippet);
+    if (suggested.options && suggested.options.length > 0) {
+      setMcqOptions(suggested.options);
+    }
+    setShowSuggestions(false);
+  };
 
   const handleAddOption = () => {
     const newId = `opt-${nanoid(4)}`;
@@ -127,32 +161,25 @@ export function QuestionFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim()) return;
-
-    const finalLanguage =
-      language === "custom" ? customLanguage.trim() || "General" : language;
-    const finalSubLanguage =
-      subLanguage === "custom"
-        ? customSubLanguage.trim() || "General"
-        : subLanguage;
+    if (!question.trim() || !type || !language) return;
 
     const formattedOptions =
       type === "mcq"
         ? mcqOptions.map((o) => ({
-            ...o,
-            isCorrect: o.id === correctOptionId,
-          }))
+          ...o,
+          isCorrect: o.id === correctOptionId,
+        }))
         : undefined;
 
     onSubmit({
       question: question.trim(),
-      type,
-      language: finalLanguage,
-      subLanguage: finalSubLanguage,
+      type: type as QuestionType,
+      language: language.trim(),
+      subLanguage: subLanguage.trim() || "",
       company: company.trim() || undefined,
-      difficulty,
+      difficulty: (difficulty as Difficulty) || undefined,
       answer: answer.trim() || undefined,
-      codeSnippet: codeSnippet.trim() || undefined,
+      codeSnippet: type === "practical" ? codeSnippet.trim() || undefined : undefined,
       options: formattedOptions,
       correctOptionId: type === "mcq" ? correctOptionId : undefined,
     });
@@ -162,147 +189,139 @@ export function QuestionFormModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-6">
         <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <HelpCircle className="h-5 w-5 text-primary" />
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold">
+              <HelpCircle className="h-5 w-5 text-primary shrink-0" />
               {editingQuestion ? "Edit Question" : "Add New Question"}
             </DialogTitle>
-            <DialogDescription>
-              Add interview question details, language/framework tags, and answer notes.
-            </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
-            {/* Question Title */}
-            <div className="space-y-1.5">
-              <Label htmlFor="question">Question Statement *</Label>
+          <div className="grid gap-5 py-3">
+            {/* Question Statement */}
+            <div className="space-y-2 relative">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="question" className="font-semibold text-xs">
+                  Question Statement *
+                </Label>
+                {suggestions.length > 0 && (
+                  <span className="text-[11px] text-primary font-medium flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" /> {suggestions.length} similar existing
+                  </span>
+                )}
+              </div>
               <Textarea
                 id="question"
                 placeholder="e.g. What is the difference between UseState and UseRef in React?"
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                onChange={(e) => {
+                  setQuestion(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
                 required
                 rows={3}
+                className="text-xs leading-relaxed"
               />
+
+              {/* Suggestions Popup */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute z-50 left-0 right-0 top-full mt-1 rounded-md border bg-popover p-2 text-popover-foreground shadow-lg">
+                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pb-1 border-b">
+                    Similar Existing Questions (Click to auto-fill)
+                  </div>
+                  <div className="grid gap-1 pt-1 max-h-44 overflow-y-auto">
+                    {suggestions.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="text-left rounded px-2 py-1.5 hover:bg-accent transition-colors flex items-center justify-between gap-2 text-xs"
+                        onClick={() => handleSelectSuggestion(item)}
+                      >
+                        <span className="font-medium truncate flex-1">{item.question}</span>
+                        <Badge variant="outline" className="text-[9px] py-0 shrink-0">
+                          {item.language}
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Type & Difficulty */}
+            {/* Question Type & Difficulty */}
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label>Question Type</Label>
-                <Select
+              <div className="space-y-2">
+                <Label className="font-semibold text-xs">Question Type *</Label>
+                <SearchableSelect
+                  options={questionTypeOptions}
                   value={type}
-                  onValueChange={(v) => setType(v as QuestionType)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="theoretical">Theoretical</SelectItem>
-                    <SelectItem value="practical">Practical / Coding</SelectItem>
-                    <SelectItem value="scenario">Scenario Based</SelectItem>
-                    <SelectItem value="mcq">MCQ Based</SelectItem>
-                  </SelectContent>
-                </Select>
+                  onChange={(v) => setType(v as QuestionType)}
+                  placeholder="Select Question Type *"
+                  searchPlaceholder="Search type..."
+                  allowCustom={false}
+                />
               </div>
 
-              <div className="space-y-1.5">
-                <Label>Difficulty Level</Label>
-                <Select
+              <div className="space-y-2">
+                <Label className="font-semibold text-xs">Difficulty (Optional)</Label>
+                <SearchableSelect
+                  options={difficultyOptions}
                   value={difficulty}
-                  onValueChange={(v) => setDifficulty(v as Difficulty)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
-                  </SelectContent>
-                </Select>
+                  onChange={(v) => setDifficulty(v as Difficulty)}
+                  placeholder="Select Difficulty"
+                  searchPlaceholder="Search difficulty..."
+                  allowCustom={false}
+                />
               </div>
             </div>
 
             {/* Language & Sub Language */}
             <div className="grid sm:grid-cols-2 gap-4">
-              {/* Language */}
-              <div className="space-y-1.5">
-                <Label>Language / Framework</Label>
-                <Select
+              <div className="space-y-2">
+                <Label className="font-semibold text-xs">Language / Tech Stack *</Label>
+                <SearchableSelect
+                  options={languageOptions}
                   value={language}
-                  onValueChange={(v) => setLanguage(v)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRESET_LANGUAGES.map((lang) => (
-                      <SelectItem key={lang} value={lang}>
-                        {lang}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value="custom">+ Other Custom Language</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {language === "custom" && (
-                  <Input
-                    placeholder="Type custom language (e.g. Angular, Tailwind, Rust)"
-                    value={customLanguage}
-                    onChange={(e) => setCustomLanguage(e.target.value)}
-                    className="mt-2"
-                  />
-                )}
+                  onChange={(v) => setLanguage(v)}
+                  placeholder="Select Language / Tech *"
+                  searchPlaceholder="Search or type tech stack..."
+                  allowCustom={true}
+                />
               </div>
 
-              {/* Sub Language / Category */}
-              <div className="space-y-1.5">
-                <Label>Sub Lang / Topic Category</Label>
-                <Select
+              <div className="space-y-2">
+                <Label className="font-semibold text-xs">Sub Lang / Topic Category</Label>
+                <SearchableSelect
+                  options={subLanguageOptions}
                   value={subLanguage}
-                  onValueChange={(v) => setSubLanguage(v)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRESET_SUB_LANGUAGES.map((sub) => (
-                      <SelectItem key={sub} value={sub}>
-                        {sub}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value="custom">+ Other Custom Category</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {subLanguage === "custom" && (
-                  <Input
-                    placeholder="Type custom sub-lang (e.g. Arrays, Strings, Flexbox)"
-                    value={customSubLanguage}
-                    onChange={(e) => setCustomSubLanguage(e.target.value)}
-                    className="mt-2"
-                  />
-                )}
+                  onChange={(v) => setSubLanguage(v)}
+                  placeholder="Select Category (Optional)"
+                  searchPlaceholder="Search or type topic category..."
+                  allowCustom={true}
+                />
               </div>
             </div>
 
-            {/* Company */}
-            <div className="space-y-1.5">
-              <Label htmlFor="company">Company Name (Optional)</Label>
-              <Input
-                id="company"
-                placeholder="e.g. Google, TCS, Infosys, Startup"
+            {/* Company Name */}
+            <div className="space-y-2">
+              <Label className="font-semibold text-xs flex items-center gap-1.5">
+                <Building2 className="h-3.5 w-3.5 text-primary" /> Company Name (Optional)
+              </Label>
+              <SearchableSelect
+                options={companyOptions}
                 value={company}
-                onChange={(e) => setCompany(e.target.value)}
+                onChange={(v) => setCompany(v)}
+                placeholder="Select applied company or type custom..."
+                searchPlaceholder="Search company or type new..."
+                allowCustom={true}
               />
             </div>
 
-            {/* MCQ Options Form */}
+            {/* MCQ Options */}
             {type === "mcq" && (
-              <div className="space-y-3 rounded-lg border bg-muted/30 p-3.5">
+              <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
                 <div className="flex items-center justify-between">
                   <Label className="font-semibold text-xs uppercase tracking-wider">
                     MCQ Options & Correct Answer
@@ -346,7 +365,7 @@ export function QuestionFormModal({
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
                           onClick={() => handleRemoveOption(opt.id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -358,35 +377,40 @@ export function QuestionFormModal({
               </div>
             )}
 
-            {/* Code Snippet Input */}
-            {(type === "practical" || type === "theoretical") && (
-              <div className="space-y-1.5">
-                <Label htmlFor="codeSnippet">Code Snippet (Optional)</Label>
+            {/* Code Snippet */}
+            {type === "practical" && (
+              <div className="space-y-2">
+                <Label htmlFor="codeSnippet" className="font-semibold text-xs">
+                  Code Snippet / Problem Starter
+                </Label>
                 <Textarea
                   id="codeSnippet"
-                  placeholder={`// Code snippet or algorithm solution...\nfunction example() {\n  return true;\n}`}
+                  placeholder="Paste starter code or code snippet..."
                   value={codeSnippet}
                   onChange={(e) => setCodeSnippet(e.target.value)}
-                  rows={4}
                   className="font-mono text-xs"
+                  rows={4}
                 />
               </div>
             )}
 
-            {/* Answer & Explanation */}
-            <div className="space-y-1.5">
-              <Label htmlFor="answer">Answer & Explanation Notes</Label>
+            {/* Answer / Notes */}
+            <div className="space-y-2">
+              <Label htmlFor="answer" className="font-semibold text-xs">
+                Answer & Solution Notes (Optional)
+              </Label>
               <Textarea
                 id="answer"
-                placeholder="Model answer, step-by-step solution, complexity analysis, or key points to remember..."
+                placeholder="Explanation, key concepts, or ideal answer approach..."
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 rows={3}
+                className="text-xs"
               />
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
@@ -394,7 +418,7 @@ export function QuestionFormModal({
             >
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={!question.trim() || !type || !language}>
               {editingQuestion ? "Save Changes" : "Add Question"}
             </Button>
           </DialogFooter>

@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import type { InterviewRecord, QuestionItem } from "@/types/interviews";
+import { formatNiceDate } from "@/lib/utils";
 
 type InterviewCardProps = {
   interview: InterviewRecord;
@@ -130,7 +131,7 @@ export function InterviewCard({
           {interview.interviewDate && (
             <span className="flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5 text-primary/70" />
-              {interview.interviewDate}
+              {formatNiceDate(interview.interviewDate)}
             </span>
           )}
           {interview.interviewerName && (

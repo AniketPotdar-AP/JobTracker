@@ -111,6 +111,7 @@ function CalendarPage() {
           let kind: EntryKind | null = null;
           if (sh.status === "recruiter_call") kind = "recruiter_call";
           else if (
+            sh.status === "screening_round" ||
             sh.status === "assessment" ||
             sh.status === "l1_interview" ||
             sh.status === "l2_interview" ||
@@ -258,7 +259,7 @@ function CalendarPage() {
               ))}
             </div>
             <div
-              className="grid grid-cols-7 gap-1 flex-1 min-h-[280px] sm:min-h-[420px] w-full min-w-0"
+              className="grid grid-cols-7 gap-1 flex-1 min-h-70 sm:min-h-105 w-full min-w-0"
               style={{
                 gridTemplateRows: `repeat(${numWeeks}, minmax(0, 1fr))`,
               }}
@@ -275,10 +276,10 @@ function CalendarPage() {
                     type="button"
                     onClick={() => setSelected(d)}
                     className={cn(
-                      "flex flex-col justify-start rounded-md border p-1 sm:p-2 text-left transition-colors hover:bg-accent h-full min-h-[44px] overflow-hidden min-w-0 w-full",
+                      "flex flex-col justify-start rounded-md border p-1 sm:p-2 text-left transition-colors hover:bg-accent h-full min-h-11 overflow-hidden min-w-0 w-full",
                       !inMonth && "opacity-30",
                       isSelected &&
-                        "border-primary ring-2 ring-primary/40 bg-primary/5 font-semibold",
+                      "border-primary ring-2 ring-primary/40 bg-primary/5 font-semibold",
                     )}
                   >
                     <div
@@ -327,14 +328,14 @@ function CalendarPage() {
         </Card>
 
         {/* Selected Date Details Card */}
-        <Card className="flex flex-col w-full min-w-0 max-w-full overflow-hidden lg:min-h-[450px]">
+        <Card className="flex flex-col w-full min-w-0 max-w-full overflow-hidden lg:min-h-112.5">
           <CardContent className="p-4 flex flex-col flex-1 min-w-0 w-full overflow-hidden">
             <div className="text-sm font-semibold border-b pb-3 shrink-0 truncate w-full min-w-0">
               {selected
                 ? format(selected, "EEEE, MMM d, yyyy")
                 : "Select a day"}
             </div>
-            <div className="mt-3 space-y-2 flex-1 overflow-y-auto max-h-[350px] lg:max-h-none w-full min-w-0">
+            <div className="mt-3 space-y-2 flex-1 overflow-y-auto max-h-87.5 lg:max-h-none w-full min-w-0">
               {selected && selectedEntries.length === 0 && (
                 <p className="text-sm text-muted-foreground py-4 text-center">
                   Nothing scheduled for this day.
@@ -357,7 +358,7 @@ function CalendarPage() {
                   </div>
                   <span
                     className={cn(
-                      "text-[10px] font-semibold uppercase tracking-wider rounded-full px-2 py-0.5 shrink-0 max-w-[110px] truncate",
+                      "text-[10px] font-semibold uppercase tracking-wider rounded-full px-2 py-0.5 shrink-0 max-w-27.5 truncate",
                       KIND_STYLE[e.kind],
                     )}
                   >

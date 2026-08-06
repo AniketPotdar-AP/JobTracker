@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import { Video, Trash2 } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { Video, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -12,16 +11,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SearchableSelect, type Option } from "@/components/ui/searchable-select";
 import type { InterviewOutcome, InterviewRecord, QuestionItem } from "@/types/interviews";
 import { InterviewQuestionForm } from "./InterviewQuestionForm";
-import { Badge } from "@/components/ui/badge";
+import { useApplicationsStore } from "@/store/useApplications";
 
 type InterviewFormModalProps = {
   open: boolean;
@@ -38,10 +31,11 @@ export function InterviewFormModal({
   onSubmit,
   editingInterview,
 }: InterviewFormModalProps) {
+  const applications = useApplicationsStore((s) => s.applications);
+
   const [company, setCompany] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [roundType, setRoundType] = useState("Screening Round");
-  const [customRoundType, setCustomRoundType] = useState("");
   const [interviewDate, setInterviewDate] = useState(
     new Date().toISOString().slice(0, 10),
   );
@@ -51,29 +45,36 @@ export function InterviewFormModal({
   const [notes, setNotes] = useState("");
   const [questions, setQuestions] = useState<Omit<QuestionItem, "id" | "dateAdded">[]>([]);
 
-  const roundOptions = [
-    "Screening Round",
-    "Recruiter Call",
-    "Assessment",
-    "L1 Technical",
-    "L2 Technical",
-    "L3 System Design",
-    "HR Round",
-    "Managerial Round",
-    "custom",
+  // Company options from applied jobs
+  const companyOptions = useMemo<Option[]>(() => {
+    const set = new Set<string>();
+    applications.forEach((a) => { if (a.company) set.add(a.company.trim()); });
+    return Array.from(set).map((c) => ({ label: c, value: c }));
+  }, [applications]);
+
+  const roundOptions: Option[] = [
+    { label: "Screening Round", value: "Screening Round" },
+    { label: "Recruiter Call", value: "Recruiter Call" },
+    { label: "Assessment", value: "Assessment" },
+    { label: "L1 Technical", value: "L1 Technical" },
+    { label: "L2 Technical", value: "L2 Technical" },
+    { label: "L3 System Design", value: "L3 System Design" },
+    { label: "HR Round", value: "HR Round" },
+    { label: "Managerial Round", value: "Managerial Round" },
+  ];
+
+  const outcomeOptions: Option[] = [
+    { label: "Completed", value: "completed" },
+    { label: "Passed", value: "passed" },
+    { label: "Failed", value: "failed" },
+    { label: "Scheduled / Pending", value: "pending" },
   ];
 
   useEffect(() => {
     if (editingInterview) {
       setCompany(editingInterview.company || "");
       setJobTitle(editingInterview.jobTitle || "");
-      if (roundOptions.includes(editingInterview.roundType)) {
-        setRoundType(editingInterview.roundType);
-        setCustomRoundType("");
-      } else {
-        setRoundType("custom");
-        setCustomRoundType(editingInterview.roundType || "");
-      }
+      setRoundType(editingInterview.roundType || "Screening Round");
       setInterviewDate(
         editingInterview.interviewDate || new Date().toISOString().slice(0, 10),
       );
@@ -86,7 +87,6 @@ export function InterviewFormModal({
       setCompany("");
       setJobTitle("");
       setRoundType("Screening Round");
-      setCustomRoundType("");
       setInterviewDate(new Date().toISOString().slice(0, 10));
       setInterviewerName("");
       setLocationOrUrl("");
@@ -108,10 +108,7 @@ export function InterviewFormModal({
     e.preventDefault();
     if (!company.trim()) return;
 
-    const finalRoundType =
-      roundType === "custom"
-        ? customRoundType.trim() || "Interview Round"
-        : roundType;
+    const finalRoundType = roundType.trim() || "Screening Round";
 
     const formattedQuestions: QuestionItem[] = questions.map((q, idx) => ({
       ...q,
@@ -139,75 +136,59 @@ export function InterviewFormModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-6">
         <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Video className="h-5 w-5 text-primary" />
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold">
+              <Video className="h-5 w-5 text-primary shrink-0" />
               {editingInterview ? "Edit Interview Round" : "Log New Interview"}
             </DialogTitle>
-            <DialogDescription>
-              Record interview round details, interviewer info, outcome, and questions asked.
-            </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 py-3">
             {/* Company & Role */}
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="company">Company Name *</Label>
-                <Input
-                  id="company"
-                  placeholder="e.g. Google, TCS, Infosys"
+              <div className="space-y-2">
+                <Label className="font-semibold text-xs flex items-center gap-1.5">
+                  <Building2 className="h-3.5 w-3.5 text-primary" /> Company Name *
+                </Label>
+                <SearchableSelect
+                  options={companyOptions}
                   value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  required
+                  onChange={(v) => setCompany(v)}
+                  placeholder="Select applied company or type custom *"
+                  searchPlaceholder="Search company or type new..."
+                  allowCustom={true}
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="jobTitle">Job Title / Role</Label>
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle" className="font-semibold text-xs">Job Title / Role</Label>
                 <Input
                   id="jobTitle"
-                  placeholder="e.g. Frontend Developer"
+                  placeholder="e.g. Senior Frontend Engineer"
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
                 />
               </div>
             </div>
 
-            {/* Round Type & Date */}
+            {/* Round Name & Interview Date */}
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label>Interview Round Type</Label>
-                <Select
+              <div className="space-y-2">
+                <Label className="font-semibold text-xs">Interview Round *</Label>
+                <SearchableSelect
+                  options={roundOptions}
                   value={roundType}
-                  onValueChange={(v) => setRoundType(v)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roundOptions.map((opt) => (
-                      <SelectItem key={opt} value={opt}>
-                        {opt === "custom" ? "+ Custom Round Name" : opt}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {roundType === "custom" && (
-                  <Input
-                    placeholder="e.g. Screening Round, System Design"
-                    value={customRoundType}
-                    onChange={(e) => setCustomRoundType(e.target.value)}
-                    className="mt-2"
-                  />
-                )}
+                  onChange={(v) => setRoundType(v)}
+                  placeholder="Select Round Type *"
+                  searchPlaceholder="Search or type round..."
+                  allowCustom={true}
+                />
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="interviewDate">Interview Date</Label>
+              <div className="space-y-2">
+                <Label htmlFor="interviewDate" className="font-semibold text-xs">Interview Date *</Label>
                 <Input
                   id="interviewDate"
                   type="date"
@@ -218,94 +199,69 @@ export function InterviewFormModal({
               </div>
             </div>
 
-            {/* Interviewer & Outcome */}
+            {/* Interviewer & Link */}
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="interviewerName">Interviewer Name</Label>
+              <div className="space-y-2">
+                <Label htmlFor="interviewerName" className="font-semibold text-xs">Interviewer Name</Label>
                 <Input
                   id="interviewerName"
-                  placeholder="e.g. John Doe (Engineering Lead)"
+                  placeholder="e.g. Lead Tech Recruiter"
                   value={interviewerName}
                   onChange={(e) => setInterviewerName(e.target.value)}
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label>Outcome Status</Label>
-                <Select
-                  value={outcome}
-                  onValueChange={(v) => setOutcome(v as InterviewOutcome)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="passed">Passed</SelectItem>
-                    <SelectItem value="failed">Failed</SelectItem>
-                    <SelectItem value="pending">Scheduled / Pending</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-2">
+                <Label htmlFor="locationOrUrl" className="font-semibold text-xs">Meeting Link / Location</Label>
+                <Input
+                  id="locationOrUrl"
+                  placeholder="e.g. meet.google.com/abc-xyz"
+                  value={locationOrUrl}
+                  onChange={(e) => setLocationOrUrl(e.target.value)}
+                />
               </div>
             </div>
 
-            {/* Meeting Link */}
-            <div className="space-y-1.5">
-              <Label htmlFor="locationOrUrl">Meeting Link / Location</Label>
-              <Input
-                id="locationOrUrl"
-                placeholder="e.g. https://meet.google.com/abc-defg-hij"
-                value={locationOrUrl}
-                onChange={(e) => setLocationOrUrl(e.target.value)}
+            {/* Round Outcome */}
+            <div className="space-y-2">
+              <Label className="font-semibold text-xs">Round Outcome</Label>
+              <SearchableSelect
+                options={outcomeOptions}
+                value={outcome}
+                onChange={(v) => setOutcome(v as InterviewOutcome)}
+                placeholder="Select Outcome"
+                searchPlaceholder="Search outcome..."
+                allowCustom={false}
               />
             </div>
 
-            {/* Notes */}
-            <div className="space-y-1.5">
-              <Label htmlFor="notes">Interview Notes & Feedback</Label>
-              <Textarea
-                id="notes"
-                placeholder="Notes on conversation, feedback received, key discussion points..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={2}
-              />
-            </div>
-
-            {/* Questions Section inside Interview Modal */}
-            <div className="space-y-3 rounded-lg border bg-muted/20 p-3.5">
-              <div className="flex items-center justify-between">
-                <Label className="font-semibold text-xs uppercase tracking-wider">
-                  Questions Asked in this Interview ({questions.length})
-                </Label>
-              </div>
+            {/* Questions Asked Section */}
+            <div className="space-y-3 pt-2 border-t">
+              <Label className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                Questions Asked in this Round ({questions.length})
+              </Label>
 
               {questions.length > 0 && (
-                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                <div className="grid gap-2 mb-2">
                   {questions.map((q, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between rounded-md border bg-background p-2.5 text-xs"
+                      className="flex items-center justify-between p-2.5 rounded-md border bg-muted/30 text-xs"
                     >
                       <div className="min-w-0 flex-1 pr-2">
-                        <div className="flex items-center gap-1.5 pb-0.5">
-                          <Badge variant="outline" className="text-[10px] py-0">
-                            {q.language}
-                          </Badge>
-                          <Badge variant="secondary" className="text-[10px] py-0">
-                            {q.subLanguage}
-                          </Badge>
-                        </div>
                         <p className="font-medium truncate">{q.question}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {q.type} • {q.language} {q.subLanguage ? `(${q.subLanguage})` : ""}
+                        </p>
                       </div>
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+                        size="sm"
+                        className="h-7 text-xs text-destructive hover:text-destructive shrink-0"
                         onClick={() => handleRemoveQuestionDraft(idx)}
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
+                        Remove
                       </Button>
                     </div>
                   ))}
@@ -314,9 +270,21 @@ export function InterviewFormModal({
 
               <InterviewQuestionForm onAddQuestion={handleAddQuestionDraft} />
             </div>
+
+            {/* General Notes */}
+            <div className="space-y-2 pt-2 border-t">
+              <Label htmlFor="notes" className="font-semibold text-xs">Round Notes & Prep (Optional)</Label>
+              <Textarea
+                id="notes"
+                placeholder="System design notes, feedback, questions to ask interviewer..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+              />
+            </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
@@ -324,7 +292,7 @@ export function InterviewFormModal({
             >
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={!company.trim() || !roundType}>
               {editingInterview ? "Save Changes" : "Log Interview"}
             </Button>
           </DialogFooter>

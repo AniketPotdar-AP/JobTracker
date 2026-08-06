@@ -32,6 +32,7 @@ import { QuestionCard } from "@/components/questions/QuestionCard";
 import { InterviewFormModal } from "@/components/interviews/InterviewFormModal";
 import { QuestionFormModal } from "@/components/questions/QuestionFormModal";
 import type { QuestionItem } from "@/types/interviews";
+import { formatNiceDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/interviews/$id")({
   head: () => ({
@@ -186,7 +187,7 @@ function InterviewDetailsPage() {
                 <span className="text-muted-foreground">Interview Date</span>
                 <span className="font-semibold flex items-center gap-1">
                   <Calendar className="h-3.5 w-3.5 text-primary/70" />
-                  {interview.interviewDate || "N/A"}
+                  {formatNiceDate(interview.interviewDate)}
                 </span>
               </div>
 

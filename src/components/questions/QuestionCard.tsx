@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, formatNiceDate } from "@/lib/utils";
 import type { QuestionItem } from "@/types/interviews";
 import {
   QUESTION_TYPE_CLASSES,
@@ -93,6 +93,13 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
               >
                 {question.difficulty}
               </span>
+            )}
+
+            {/* Asked Count Badge */}
+            {question.askedCount && question.askedCount > 1 && (
+              <Badge variant="secondary" className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 gap-1 text-[11px] font-bold">
+                <Sparkles className="h-3 w-3" /> Asked {question.askedCount} times
+              </Badge>
             )}
           </div>
 

@@ -32,7 +32,7 @@ import {
   QUESTION_TYPE_LABELS,
 } from "@/types/interviews";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, formatNiceDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/questions/$id")({
   head: () => ({
@@ -159,10 +159,16 @@ function QuestionDetailsPage() {
               </Badge>
             )}
 
+            {question.askedCount && question.askedCount > 1 && (
+              <Badge variant="secondary" className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 gap-1 text-xs font-bold">
+                <Sparkles className="h-3.5 w-3.5" /> Asked {question.askedCount} times
+              </Badge>
+            )}
+
             {question.dateAdded && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground ml-auto sm:ml-0">
                 <Calendar className="h-3.5 w-3.5" />
-                {question.dateAdded}
+                {formatNiceDate(question.dateAdded)}
               </span>
             )}
           </div>

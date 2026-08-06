@@ -24,6 +24,8 @@ export type QuestionItem = {
   options?: MCQOption[];
   correctOptionId?: string;
   difficulty?: Difficulty;
+  askedCount?: number;
+  companiesAsked?: string[];
   dateAdded: string;
   notes?: string;
   tags?: string[];

@@ -19,7 +19,15 @@ import {
   XCircle,
   Clock,
   ExternalLink,
+  ArrowUpDown,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PageHeader } from "@/components/common/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -63,6 +71,7 @@ import {
 import { InterviewCard } from "@/components/interviews/InterviewCard";
 import { InterviewFormModal } from "@/components/interviews/InterviewFormModal";
 import { QuestionFormModal } from "@/components/questions/QuestionFormModal";
+import { cn, formatNiceDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/interviews")({
   head: () => ({
@@ -88,6 +97,7 @@ function InterviewsPage() {
 
   // View state: 'table' as default
   const [view, setView] = useState<"table" | "grid">("table");
+  const [sortBy, setSortBy] = useState<"date_desc" | "date_asc" | "company_asc" | "questions_desc">("date_desc");
 
   // Search & Filter State
   const [query, setQuery] = useState("");
@@ -288,6 +298,25 @@ function InterviewsPage() {
     subLanguageFilter,
   ]);
 
+  const sortedInterviews = useMemo(() => {
+    return [...filteredInterviews].sort((a, b) => {
+      if (sortBy === "date_desc") {
+        const dateA = a.interviewDate || a.createdAt || "";
+        const dateB = b.interviewDate || b.createdAt || "";
+        return dateB.localeCompare(dateA);
+      }
+      if (sortBy === "date_asc") {
+        const dateA = a.interviewDate || a.createdAt || "";
+        const dateB = b.interviewDate || b.createdAt || "";
+        return dateA.localeCompare(dateB);
+      }
+      if (sortBy === "company_asc") {
+        return a.company.localeCompare(b.company);
+      }
+      return b.questions.length - a.questions.length;
+    });
+  }, [filteredInterviews, sortBy]);
+
   const outcomeBadges = {
     passed: (
       <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 gap-1 text-[11px]">
@@ -342,7 +371,21 @@ function InterviewsPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Sort Control */}
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+            <SelectTrigger className="h-9 w-[175px] text-xs bg-background">
+              <ArrowUpDown className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date_desc">Date (Latest First)</SelectItem>
+              <SelectItem value="date_asc">Date (Oldest First)</SelectItem>
+              <SelectItem value="company_asc">Company (A - Z)</SelectItem>
+              <SelectItem value="questions_desc">Questions (Highest)</SelectItem>
+            </SelectContent>
+          </Select>
+
           {/* View Toggle */}
           <div className="flex items-center rounded-lg border bg-muted p-0.5">
             <Button
@@ -430,7 +473,7 @@ function InterviewsPage() {
 
       {/* Main Content Area */}
       <div className="mt-6">
-        {filteredInterviews.length === 0 ? (
+        {sortedInterviews.length === 0 ? (
           <EmptyState
             icon={<Video className="h-6 w-6" />}
             title={interviews.length === 0 ? "No interviews logged yet" : "No matching interviews found"}
@@ -471,7 +514,7 @@ function InterviewsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredInterviews.map((iv) => (
+                {sortedInterviews.map((iv) => (
                   <TableRow key={iv.id} className="hover:bg-muted/30 transition-colors">
                     {/* Company & Role */}
                     <TableCell className="font-medium">
@@ -496,7 +539,7 @@ function InterviewsPage() {
 
                     {/* Interview Date */}
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      {iv.interviewDate || "—"}
+                      {formatNiceDate(iv.interviewDate)}
                     </TableCell>
 
                     {/* Questions Count */}
@@ -520,27 +563,6 @@ function InterviewsPage() {
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
-                        {/* <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          onClick={() => {
-                            setEditingInterview(iv);
-                            setFormOpen(true);
-                          }}
-                          title="Edit interview"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          onClick={() => setPendingDeleteId(iv.id)}
-                          title="Delete interview"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button> */}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -551,7 +573,7 @@ function InterviewsPage() {
         ) : (
           /* Grid View */
           <div className="grid gap-6">
-            {filteredInterviews.map((iv) => (
+            {sortedInterviews.map((iv) => (
               <InterviewCard
                 key={iv.id}
                 interview={iv}
