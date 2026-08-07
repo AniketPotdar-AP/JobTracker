@@ -399,28 +399,28 @@ function ApplicationsPage() {
 
               {/* Table View */}
               <Card className="overflow-hidden p-0">
-                <Table className="min-w-[850px]">
+                <Table className="min-w-212.5">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="min-w-[150px]">Company</TableHead>
-                      <TableHead className="min-w-[160px]">Title</TableHead>
-                      <TableHead className="min-w-[150px]">Status</TableHead>
-                      <TableHead className="min-w-[130px]">Location</TableHead>
-                      <TableHead className="min-w-[110px]">Source</TableHead>
-                      <TableHead className="min-w-[120px]">Applied</TableHead>
-                      <TableHead className="min-w-[110px] text-right">Actions</TableHead>
+                      <TableHead className="min-w-37.5">Company</TableHead>
+                      <TableHead className="min-w-40">Title</TableHead>
+                      <TableHead className="min-w-37.5">Status</TableHead>
+                      <TableHead className="min-w-32.5">Location</TableHead>
+                      <TableHead className="min-w-27.5">Source</TableHead>
+                      <TableHead className="min-w-30">Applied</TableHead>
+                      <TableHead className="min-w-27.5 text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filtered.map((a) => (
                       <TableRow key={a.id}>
-                        <TableCell className="font-medium min-w-[150px]">
+                        <TableCell className="font-medium min-w-37.5">
                           <span>{a.company}</span>
                         </TableCell>
-                        <TableCell className="text-muted-foreground min-w-[160px]">
+                        <TableCell className="text-muted-foreground min-w-40">
                           {a.title}
                         </TableCell>
-                        <TableCell className="min-w-[150px]">
+                        <TableCell className="min-w-37.5">
                           <Select
                             value={a.status}
                             onValueChange={(val) => {
@@ -438,13 +438,13 @@ function ApplicationsPage() {
                             </SelectValue>
                           </Select>
                         </TableCell>
-                        <TableCell className="text-muted-foreground min-w-[130px]">
+                        <TableCell className="text-muted-foreground min-w-32.5">
                           {a.location ?? "—"}
                         </TableCell>
-                        <TableCell className="text-muted-foreground min-w-[110px]">
+                        <TableCell className="text-muted-foreground min-w-27.5">
                           {a.source}
                         </TableCell>
-                        <TableCell className="text-muted-foreground min-w-[120px] whitespace-nowrap">
+                        <TableCell className="text-muted-foreground min-w-30 whitespace-nowrap">
                           {fmtDate(a.appliedDate)}
                         </TableCell>
                         <TableCell>

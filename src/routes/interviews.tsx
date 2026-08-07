@@ -345,7 +345,7 @@ function InterviewsPage() {
       <PageHeader
         title="Interviews"
         description="Log and manage your interview rounds along with all technical, theoretical, scenario, and MCQ questions asked."
-        action={
+        actions={
           <Button
             className="gap-2 shadow-sm"
             onClick={() => {
