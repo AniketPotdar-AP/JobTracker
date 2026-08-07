@@ -1,0 +1,134 @@
+[
+  {
+    "id": "q-bxmSSoUa",
+    "interviewId": "iv-B15iKvqb",
+    "question": "Which Angular version you have worked on",
+    "type": "theoretical",
+    "language": "Angular",
+    "subLanguage": null,
+    "difficulty": "easy",
+    "company": "Baxture Technologies",
+    "jobTitle": "Angular Developer",
+    "roundType": "Screening Round",
+    "askedCount": 1,
+    "answer": null,
+    "codeSnippet": null,
+    "notes": null,
+    "options": null,
+    "correctOptionIndex": null,
+    "dateAdded": "2026-08-06",
+    "companiesAsked": [
+      "Baxture Technologies"
+    ]
+  },
+  {
+    "id": "q-3Ih73WPd",
+    "interviewId": "iv-B15iKvqb",
+    "question": "Which are the latest Angular versions and what are the new changes in them",
+    "type": "theoretical",
+    "language": "Angular",
+    "subLanguage": null,
+    "difficulty": "easy",
+    "company": "Baxture Technologies",
+    "jobTitle": "Angular Developer",
+    "roundType": "Screening Round",
+    "askedCount": 1,
+    "answer": null,
+    "codeSnippet": null,
+    "notes": null,
+    "options": null,
+    "correctOptionIndex": null,
+    "dateAdded": "2026-08-06",
+    "companiesAsked": [
+      "Baxture Technologies"
+    ]
+  },
+  {
+    "id": "q-g28l7GV1",
+    "interviewId": "iv-B15iKvqb",
+    "question": "Find the Character with Maximum Occurrence",
+    "type": "practical",
+    "language": "JavaScript",
+    "subLanguage": "Objects, Strings",
+    "difficulty": "medium",
+    "company": "Baxture Technologies",
+    "jobTitle": "Angular Developer",
+    "roundType": "Screening Round",
+    "askedCount": 1,
+    "answer": "let str = 'mississippi';\n let obj = {};\n let max;\n \n for(let i = 0; i < str.length; i++) {\n     max = str[i]\n    if(obj[str[i]]) {\n        obj[str[i]] += 1;\n        if(obj[str[i]] > obj[max]) {\n            max = str[i]\n        }\n    } else {\n         obj[str[i]] = 1;\n    }\n }\n\n\nOutput:\n\noriginal string = mississippi\nhighest = i",
+    "codeSnippet": "// Input - mississippi",
+    "notes": null,
+    "options": null,
+    "correctOptionIndex": null,
+    "dateAdded": "2026-08-06",
+    "companiesAsked": [
+      "Baxture Technologies"
+    ]
+  },
+  {
+    "id": "q-oF3thoW4",
+    "interviewId": "iv-mnuZDI92",
+    "question": "Find Highest unique from an array of number",
+    "type": "practical",
+    "language": "JavaScript",
+    "subLanguage": "Arrays, Objects",
+    "difficulty": "medium",
+    "company": "Light & Wonder",
+    "jobTitle": "Front-End Engineer",
+    "roundType": "L1 Interview",
+    "askedCount": 1,
+    "answer": null,
+    "codeSnippet": "Input: [5, 10, 8, 10, 6, 15, Infinity, null]",
+    "notes": null,
+    "options": null,
+    "correctOptionIndex": null,
+    "dateAdded": "2026-07-25",
+    "companiesAsked": [
+      "Light & Wonder"
+    ]
+  },
+  {
+    "id": "q-37qUORxF",
+    "interviewId": "iv-mnuZDI92",
+    "question": "Explain any one of your Project",
+    "type": "theoretical",
+    "language": "Personal",
+    "subLanguage": null,
+    "difficulty": "medium",
+    "company": "Light & Wonder",
+    "jobTitle": "Front-End Engineer",
+    "roundType": "L1 Interview",
+    "askedCount": 1,
+    "answer": null,
+    "codeSnippet": null,
+    "notes": null,
+    "options": null,
+    "correctOptionIndex": null,
+    "dateAdded": "2026-07-25",
+    "companiesAsked": [
+      "Light & Wonder"
+    ]
+  },
+  {
+    "id": "q-yr25xeJo",
+    "interviewId": "iv-mnuZDI92",
+    "question": "Sort Array to show Even numbers first and Odd numbers after without changing their sequence ( Two Sum )",
+    "type": "practical",
+    "language": "JavaScript",
+    "subLanguage": "Arrays",
+    "difficulty": "medium",
+    "company": "Light & Wonder",
+    "jobTitle": "Front-End Engineer",
+    "roundType": "L1 Interview",
+    "askedCount": 1,
+    "answer": null,
+    "codeSnippet": "Input : [2,3,4,5,6,7,8]\nExpected: [2,4,6,3,5,7]\n\ncase 1 : Using 2 arrays\ncase 2 : using same input array",
+    "notes": null,
+    "options": null,
+    "correctOptionIndex": null,
+    "dateAdded": "2026-07-25",
+    "companiesAsked": [
+      "Light & Wonder"
+    ]
+  }
+]

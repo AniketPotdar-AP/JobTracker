@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import {
   Plus,
   Search,
@@ -19,6 +19,7 @@ import {
   XCircle,
   Clock,
   ExternalLink,
+  Upload,
   ArrowUpDown,
 } from "lucide-react";
 import {
@@ -61,7 +62,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { MultiSelect, type Option } from "@/components/ui/multi-select";
-import { useInterviewsStore } from "@/store/useInterviews";
+import { useInterviewsStore, getInterviewQuestions } from "@/store/useInterviews";
 import type { InterviewRecord, QuestionItem, QuestionType } from "@/types/interviews";
 import {
   PRESET_LANGUAGES,
@@ -72,6 +73,9 @@ import { InterviewCard } from "@/components/interviews/InterviewCard";
 import { InterviewFormModal } from "@/components/interviews/InterviewFormModal";
 import { QuestionFormModal } from "@/components/questions/QuestionFormModal";
 import { cn, formatNiceDate } from "@/lib/utils";
+import { toast } from "sonner";
+import { processSmartJsonImport } from "@/lib/data-importer";
+import { useApplicationsStore } from "@/store/useApplications";
 
 export const Route = createFileRoute("/interviews")({
   head: () => ({
@@ -88,6 +92,11 @@ export const Route = createFileRoute("/interviews")({
 
 function InterviewsPage() {
   const interviews = useInterviewsStore((s) => s.interviews);
+  const standaloneQuestions = useInterviewsStore((s) => s.standaloneQuestions);
+  const importInterviews = useInterviewsStore((s) => s.importInterviews);
+  const importQuestions = useInterviewsStore((s) => s.importQuestions);
+  const importAppsData = useApplicationsStore((s) => s.importData);
+  const importFileRef = useRef<HTMLInputElement>(null);
   const addInterview = useInterviewsStore((s) => s.addInterview);
   const updateInterview = useInterviewsStore((s) => s.updateInterview);
   const deleteInterview = useInterviewsStore((s) => s.deleteInterview);
@@ -340,21 +349,55 @@ function InterviewsPage() {
     ),
   };
 
+  const handleImportFile = async (file: File) => {
+    try {
+      const text = await file.text();
+      const stats = await processSmartJsonImport(text, {
+        importApplications: async (data) => importAppsData(data),
+        importInterviews: async (data) => importInterviews(data),
+        importQuestions: async (data) => importQuestions(data),
+      });
+      toast.success(`Imported ${stats.interviews || stats.questions || stats.applications} records`);
+    } catch {
+      toast.error("Could not import file — invalid JSON format.");
+    }
+  };
+
   return (
     <>
+      <input
+        ref={importFileRef}
+        type="file"
+        accept="application/json"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void handleImportFile(f);
+          e.target.value = "";
+        }}
+      />
       <PageHeader
         title="Interviews"
         description="Log and manage your interview rounds along with all technical, theoretical, scenario, and MCQ questions asked."
         actions={
-          <Button
-            className="gap-2 shadow-sm"
-            onClick={() => {
-              setEditingInterview(null);
-              setFormOpen(true);
-            }}
-          >
-            <Plus className="h-4 w-4" /> Log Interview
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => importFileRef.current?.click()}
+              className="gap-1.5"
+            >
+              <Upload className="h-4 w-4" /> Import
+            </Button>
+            <Button
+              className="gap-2 shadow-sm"
+              onClick={() => {
+                setEditingInterview(null);
+                setFormOpen(true);
+              }}
+            >
+              <Plus className="h-4 w-4" /> Log Interview
+            </Button>
+          </div>
         }
       />
 
@@ -545,7 +588,7 @@ function InterviewsPage() {
                     {/* Questions Count */}
                     <TableCell className="text-center">
                       <Badge variant="secondary" className="font-semibold text-xs">
-                        {iv.questions.length} questions
+                        {getInterviewQuestions(iv, standaloneQuestions).length} questions
                       </Badge>
                     </TableCell>
 
@@ -584,7 +627,7 @@ function InterviewsPage() {
                 onDelete={(id) => setPendingDeleteId(id)}
                 onAddQuestion={(id) => setAddQuestionModalIvId(id)}
                 onEditQuestion={(q) => setEditingQuestion(q)}
-                onDeleteQuestion={(qId) => deleteQuestion(qId)}
+                onDeleteQuestion={(qId) => deleteQuestion(qId, iv.id)}
               />
             ))}
           </div>

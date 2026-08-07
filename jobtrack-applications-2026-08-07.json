@@ -1,0 +1,563 @@
+[
+  {
+    "id": "45a46810-0c14-463d-a505-13f1b8682f6b",
+    "company": "Empliance Technologies",
+    "title": "Full Stack Developer",
+    "location": "Remote",
+    "workMode": "remote",
+    "appliedDate": "2026-07-31T00:00:00+00:00",
+    "status": "rejected",
+    "source": "LinkedIn",
+    "recruiterName": "Prachi Soni",
+    "recruiterPhone": "8302104158‬",
+    "jobUrl": "https://www.linkedin.com/posts/soni-prachii_hiring-remotejobs-fullstackdeveloper-share-7488830851850366977-LqO1/?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADVNtjsB2_Hl9H1CqndO-uaMeYNevIQuApM",
+    "resumeUsed": "Fullstack resume",
+    "interviewDate": "2026-08-03T00:00:00+00:00",
+    "rejectionDate": "2026-08-03T00:00:00+00:00",
+    "notes": "🚀 We're Hiring: Full Stack Developer (MEAN Stack) 🚀\nAre you passionate about building modern, scalable web applications? Do you enjoy working with the latest technologies and AI-powered development tools? If yes, Empliance Technologies wants to hear from you!\n\n💼 Position: Full Stack Developer (MEAN Stack)\n📅Experience: 2+ Years\n🌍Work mode: Remote\n\nRequirements:\n✅ Node.js, Express, TypeScript, Angular & MongoDB\n✅ Experience with Claude Code, Codex, or similar AI coding tools\n✅ Git/GitHub and code review experience\n✅ Built at least one AI Agent or LLM-powered application (GitHub/project demo preferred)\n\nResponsibilities:\n• Develop scalable MEAN stack applications\n• Build responsive Angular frontends and Node.js backends\n• Optimize MongoDB databases\n• Collaborate in Agile teams using GitHub, Jira & AWS CI/CD\n• Ensure secure, high-quality, and scalable code\n\n📩 Interested? Apply now by filling out the application form:\n🔗 https://lnkd.in/gH2zBZqu\n\nKnow someone who'd be a great fit? Tag them or share this post",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-07-31T11:50:52.242706+00:00",
+    "updatedAt": "2026-08-03T13:10:24.296247+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-31T00:00:00.000Z",
+        "status": "applied"
+      },
+      {
+        "at": "2026-07-31T00:00:00.000Z",
+        "status": "recruiter_call"
+      },
+      {
+        "at": "2026-08-03T00:00:00.000Z",
+        "status": "l1_interview"
+      },
+      {
+        "at": "2026-08-03T00:00:00.000Z",
+        "status": "rejected"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-08-03T00:00:00.000Z",
+        "id": "elKaUR",
+        "kind": "status",
+        "message": "Status changed to Rejected"
+      },
+      {
+        "at": "2026-08-03T00:00:00.000Z",
+        "id": "FVxRAD",
+        "kind": "status",
+        "message": "Status changed to L1 Interview"
+      },
+      {
+        "at": "2026-07-31T00:00:00.000Z",
+        "id": "txGR_D",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-31T00:00:00.000Z",
+        "id": "MQ5yFY",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-31T00:00:00.000Z",
+        "id": "N-kQrR",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-31T00:00:00.000Z",
+        "id": "aZCzPM",
+        "kind": "created",
+        "message": "Added Empliance Technologies — Full Stack Developer"
+      }
+    ]
+  },
+  {
+    "id": "bd5e9082-e601-4356-aa3c-1c18f9cdb6e7",
+    "company": "Purple Sky Health",
+    "title": "Frontend Developer",
+    "location": "Remote",
+    "workMode": "remote",
+    "appliedDate": "2026-07-23T00:00:00+00:00",
+    "status": "l2_interview",
+    "source": "Other",
+    "recruiterName": "Divya",
+    "salary": "6 LPA",
+    "resumeUsed": "Fullstack resume",
+    "interviewDate": "2026-08-12T00:00:00+00:00",
+    "notes": "Job Title: Frontend Developer – Angular (2+ Years Experience)\nJob Description:\nWe are looking for a skilled Angular Developer with at least 2 years of hands-on experience to join our growing team. The ideal candidate should also have working knowledge of SQL Server, Core .Net or Node.js, and be capable of contributing to both frontend and backend development.\n________________________________________\nKey Responsibilities:\n•\tDevelop and maintain dynamic, responsive web applications using Angular (v11+ preferred).\n•\tCollaborate with UI/UX designers and backend developers to integrate user-facing elements.\n•\tWrite reusable, testable, and efficient code.\n•\tTroubleshoot and debug application issues across the full stack.\n•\tParticipate in code reviews, testing, and deployment activities.\n________________________________________\nRequired Skills:\n•\t2+ years of professional experience with Angular.\n•\tStrong proficiency in JavaScript/TypeScript, HTML, and CSS.\n•\tExperience with SQL Server – writing queries, stored procedures, and performance tuning.\n•\tWorking knowledge of Core .Net or Node.js and RESTful APIs.\n•\tFamiliarity with version control systems (e.g., Git).\n•\tGood understanding of software development lifecycle and agile methodologies.\n________________________________________\nNice to Have:\n•\tExperience with Angular Material or other UI libraries.\n•\tSQL Server queries development.\n________________________________________\nQualifications:\n•\tBachelor’s degree in computer science, Engineering, or a related field (or equivalent experience).\n",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-07-30T09:44:49.934068+00:00",
+    "updatedAt": "2026-08-07T08:39:54.098195+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-23T00:00:00.000Z",
+        "status": "applied"
+      },
+      {
+        "at": "2026-07-23T00:00:00.000Z",
+        "status": "recruiter_call"
+      },
+      {
+        "at": "2026-07-29T00:00:00.000Z",
+        "status": "l1_interview"
+      },
+      {
+        "at": "2026-08-12T00:00:00.000Z",
+        "status": "l2_interview"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-08-12T00:00:00.000Z",
+        "id": "jCNmAr",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-08-08T00:00:00.000Z",
+        "id": "rtN8os",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-08-12T00:00:00.000Z",
+        "id": "Iuv8a1",
+        "kind": "status",
+        "message": "Status changed to L2 Interview"
+      },
+      {
+        "at": "2026-07-29T00:00:00.000Z",
+        "id": "wiTAHP",
+        "kind": "status",
+        "message": "Status changed to L1 Interview"
+      },
+      {
+        "at": "2026-08-03T00:00:00.000Z",
+        "id": "4hxWZl",
+        "kind": "status",
+        "message": "Status changed to L2 Interview"
+      },
+      {
+        "at": "2026-07-29T00:00:00.000Z",
+        "id": "FRT9rJ",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-29T00:00:00.000Z",
+        "id": "sNSNxr",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-29T00:00:00.000Z",
+        "id": "bV-HvX",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-29T00:00:00.000Z",
+        "id": "fojg_j",
+        "kind": "status",
+        "message": "Status changed to L1 Interview"
+      },
+      {
+        "at": "2026-07-23T00:00:00.000Z",
+        "id": "WNAhiX",
+        "kind": "created",
+        "message": "Added Purple Sky Health — Frontend Developer"
+      }
+    ]
+  },
+  {
+    "id": "f5fec1fd-2b6e-4185-8a58-a99f49f6a5c8",
+    "company": "Baxture Technologies",
+    "title": "Angular Developer",
+    "location": "Baner",
+    "workMode": "remote",
+    "appliedDate": "2026-07-22T00:00:00+00:00",
+    "status": "l1_interview",
+    "source": "LinkedIn",
+    "recruiterName": "Shruti Mahalkar",
+    "jobUrl": "https://www.linkedin.com/posts/anu-magotra-b748aa90_baxture-is-hiring-technologies-angular-share-7485022938442915841-GYUY/?utm_source=share&utm_medium=member_desktop&rcm=ACoAADVNtjsB2_Hl9H1CqndO-uaMeYNevIQuApM",
+    "salary": "7 LPA",
+    "resumeUsed": "Fullstack resume",
+    "interviewDate": "2026-08-08T00:00:00+00:00",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-08-06T06:42:06.192567+00:00",
+    "updatedAt": "2026-08-07T08:24:31.1215+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-22T00:00:00.000Z",
+        "status": "applied"
+      },
+      {
+        "at": "2026-08-04T00:00:00.000Z",
+        "status": "recruiter_call"
+      },
+      {
+        "at": "2026-08-06T00:00:00.000Z",
+        "status": "screening_round"
+      },
+      {
+        "at": "2026-08-08T00:00:00.000Z",
+        "status": "l1_interview"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-08-08T00:00:00.000Z",
+        "id": "hiY8JG",
+        "kind": "status",
+        "message": "Status changed to L1 Interview"
+      },
+      {
+        "at": "2026-08-06T00:00:00.000Z",
+        "id": "DaHdt1",
+        "kind": "status",
+        "message": "Status changed to Screening Round"
+      },
+      {
+        "at": "2026-08-04T00:00:00.000Z",
+        "id": "0RihvL",
+        "kind": "created",
+        "message": "Added Baxture Technologies — Angular Developer"
+      }
+    ]
+  },
+  {
+    "id": "1c870a63-7f0c-4d2c-bb50-33c63890c1e4",
+    "company": "Pryxel Networks",
+    "title": "Full Stack Developer",
+    "location": "Hinjewadi",
+    "workMode": "hybrid",
+    "appliedDate": "2026-07-19T00:00:00+00:00",
+    "status": "position_filled",
+    "source": "LinkedIn",
+    "salary": "7-8 LPA",
+    "resumeUsed": "Fullstack resume",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-07-31T05:13:08.460638+00:00",
+    "updatedAt": "2026-07-31T05:13:08.460638+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-31T00:00:00.000Z",
+        "status": "position_filled"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-07-31T00:00:00.000Z",
+        "id": "mWqUgk",
+        "kind": "created",
+        "message": "Added Pryxel Networks — Full Stack Developer"
+      }
+    ]
+  },
+  {
+    "id": "fe18a946-6770-467f-8a91-491364bbfdc2",
+    "company": "Partex AI",
+    "title": "Full Stack developer",
+    "location": "Hinjewadi",
+    "workMode": "onsite",
+    "appliedDate": "2026-07-18T00:00:00+00:00",
+    "status": "rejected",
+    "source": "Naukri",
+    "salary": "7-8 LPA",
+    "resumeUsed": "Fullstack resume",
+    "interviewDate": "2026-07-23T00:00:00+00:00",
+    "rejectionDate": "2026-07-28T00:00:00+00:00",
+    "notes": "Position: Full-Stack Developer\nDepartment: Technology\nLocation: Hinjewadi, Phase-1, Pune, Maharashtra (WFO)\n\nAbout Partex.AI\nPartex.AI is a pioneer at the intersection of Artificial Intelligence and Healthcare, driven by a bold\n\nvision to revolutionize medical research, diagnostics, and therapeutic development through data-\ndriven intelligence. By leveraging cutting-edge AI technologies, connected platforms, and\n\nintelligent analytics, Partex.AI empowers leading healthcare organizations to make smarter\ndecisions, accelerate innovation, and ultimately improve patient outcomes worldwide.\nAs a fast-growing company with a global mindset and a strong focus on real-world impact,\nPartex.AI stands at an exciting inflection point in its evolution. Our Pune team is part of the wider\nengineering organization, building and running product engineering, delivery, quality assurance\nand data engineering for our Life Sciences business, in close collaboration with colleagues across\nGermany, Switzerland, India, and the USA.\n\nKey skills required:\n• Design, build and maintain features across our AI platform: Angular/TypeScript front end,\nNode.js/Express.js backend services, and the supporting data layer.\n• Work across both large developments (new modules, new AI-powered capabilities, new\nintegrations) and small incremental changes (fixes, enhancements, data connections, and\naccess-specific functions).\n• Build and maintain integrations with third-party and pharma-specific platforms (e.g.\nVeeva, PubMed, Embase, DistillerSR) via REST APIs and custom API connectors.\nTechnology Stack You'll Work With\nOur platform is fully cloud-based and multi-tenant. Strong fundamentals in the core\nlanguages and frameworks, plus a willingness to work across new and emerging tools, are\nexpected:\nFrontend - Angular 14+, TypeScript\nBackend - Node.js, Express.js, LangGraph (and comparable LLM orchestration frameworks such\nas LangChain)\n\nData Layer - MongoDB / AWS DocumentDB , PostgreSQL, Redis (caching & queues)\nCloud & Infrastructure –\n• AWS: S3, RDS, DocumentDB, KMS, CloudWatch\n• Azure: Blob Storage, Cosmos DB\n• Multi-region deployments across Europe, the US and APAC\nOther -\n• Custom API connectors and RESTful integration patterns.\n• BullMQ for background/queue processing.\n• SSO integrations (Azure AD, Okta) and role-based access control in a multi-tenant\narchitecture.\nKey Qualifications -\n• Bachelor's degree in Computer Science, Information Technology, Engineering, or a related\nfield.\n• 3–8 years of professional full-stack development experience.\n• Strong hands-on experience with Node.js and a modern frontend framework (Angular\npreferred; strong React/Vue experience also considered).\n• Solid TypeScript/JavaScript fundamentals and comfort working across the stack rather\nthan front end or back end only.\n• Experience with at least one relational and one document/NoSQL database (e.g.\nPostgreSQL and MongoDB).\n• Experience building and consuming REST APIs; comfort with tools like Postman for\ntesting integrations.\n• Exposure to cloud platforms (AWS and/or Azure) and containerized deployments\n(Docker).",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-07-30T09:39:17.838678+00:00",
+    "updatedAt": "2026-07-30T09:45:54.347854+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-18T00:00:00.000Z",
+        "status": "applied"
+      },
+      {
+        "at": "2026-07-23T00:00:00.000Z",
+        "status": "l1_interview"
+      },
+      {
+        "at": "2026-07-28T00:00:00.000Z",
+        "status": "rejected"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-07-28T00:00:00.000Z",
+        "id": "V3XQlS",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-28T00:00:00.000Z",
+        "id": "Pd8ylX",
+        "kind": "status",
+        "message": "Status changed to Rejected"
+      },
+      {
+        "at": "2026-07-23T00:00:00.000Z",
+        "id": "VL-RMu",
+        "kind": "status",
+        "message": "Status changed to L1 Interview"
+      },
+      {
+        "at": "2026-07-18T00:00:00.000Z",
+        "id": "bagGF8",
+        "kind": "created",
+        "message": "Added Partex AI — Full Stack developer"
+      }
+    ]
+  },
+  {
+    "id": "00b4e585-0289-4d04-b9f9-229fd94dbb5b",
+    "company": "Appcart Systems Pvt Ltd",
+    "title": "Frontend Developer",
+    "location": "Bavdhan",
+    "workMode": "onsite",
+    "appliedDate": "2026-07-04T00:00:00+00:00",
+    "status": "rejected",
+    "source": "LinkedIn",
+    "salary": "7-8 LPA",
+    "resumeUsed": "Fullstack resume",
+    "interviewDate": "2026-07-07T00:00:00+00:00",
+    "rejectionDate": "2026-07-10T00:00:00+00:00",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-07-30T09:37:51.947969+00:00",
+    "updatedAt": "2026-07-30T09:38:32.846016+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-04T00:00:00.000Z",
+        "status": "applied"
+      },
+      {
+        "at": "2026-07-07T00:00:00.000Z",
+        "status": "l1_interview"
+      },
+      {
+        "at": "2026-07-10T00:00:00.000Z",
+        "status": "rejected"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-07-10T00:00:00.000Z",
+        "id": "OupIs8",
+        "kind": "status",
+        "message": "Status changed to Rejected"
+      },
+      {
+        "at": "2026-07-07T00:00:00.000Z",
+        "id": "B3Zrnw",
+        "kind": "status",
+        "message": "Status changed to L1 Interview"
+      },
+      {
+        "at": "2026-07-07T00:00:00.000Z",
+        "id": "GsZdGV",
+        "kind": "created",
+        "message": "Added Appcart Systems Pvt Ltd — Frontend Developer"
+      }
+    ]
+  },
+  {
+    "id": "c17f33e5-a41d-4875-90f8-fd6345225916",
+    "company": "Estevia Tech Solutions",
+    "title": "Full Stack Developer",
+    "location": "Pune",
+    "workMode": "onsite",
+    "appliedDate": "2026-07-03T00:00:00+00:00",
+    "status": "ghosted",
+    "source": "LinkedIn",
+    "salary": "6-7 LPA",
+    "resumeUsed": "Fullstack resume",
+    "rejectionDate": "2026-07-06T00:00:00+00:00",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-07-30T09:41:18.774892+00:00",
+    "updatedAt": "2026-07-30T09:42:58.860331+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-03T00:00:00.000Z",
+        "status": "applied"
+      },
+      {
+        "at": "2026-07-06T00:00:00.000Z",
+        "status": "ghosted"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-07-06T00:00:00.000Z",
+        "id": "I_Aw6C",
+        "kind": "status",
+        "message": "Status changed to Ghosted"
+      },
+      {
+        "at": "2026-07-03T00:00:00.000Z",
+        "id": "sj7BhE",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-06T00:00:00.000Z",
+        "id": "3AjcYV",
+        "kind": "created",
+        "message": "Added Estevia Tech Solutions — Full Stack Developer"
+      }
+    ]
+  },
+  {
+    "id": "d1334da9-83fb-400d-b58a-285558ed9400",
+    "company": "Light & Wonder",
+    "title": "Front-End Engineer",
+    "location": "Yerwada",
+    "workMode": "hybrid",
+    "appliedDate": "2026-07-02T00:00:00+00:00",
+    "status": "rejected",
+    "source": "Company Portal",
+    "salary": "7-8 LPA",
+    "resumeUsed": "Fullstack resume",
+    "interviewDate": "2026-07-25T00:00:00+00:00",
+    "rejectionDate": "2026-07-27T00:00:00+00:00",
+    "notes": "iGaming: If it’s iGaming, we know a thing or two. At Light & Wonder, It’s all about the games, and our digital team leads the global iGaming market, providing jaw-dropping content and innovative software that powers the world's most successful online gaming providers.\\n\\nPosition Summary\\n\\nAbout Company\\n\\nLight & Wonder is a global leader in game experiences. We create content, hardware and systems that connect iconic titles across any place or channel. By turning games into expansive entertainment, we keep thrilling players with characters and stories they can’t get enough of.\\n\\nLight & Wonder, Inc. is the leading cross-platform global games company. Through our three unique, yet highly complementary business segments, we deliver unforgettable experiences by combining the exceptional talents of our 6,500+ member team, with a deep understanding of our customers and players. We create immersive content that forges lasting connections with players, wherever they choose to engage. At Light & Wonder, it’s all about the games. The Company is committed to the highest standards of integrity, from promoting player responsibility to implementing sustainable practices. To learn more visit www.lnw.com. \\n\\nWe are committed to offering very competitive benefits that are aligned with our values and inspire employees to drive innovation and contribute to the organization’s performance. Employees are the most valued resource, and we always look to improve their well-being with a wide range of benefits befitting every individual. Not limited to monetary benefits, we have robust learning and development opportunities that help them to grow professionally.\\n\\nOur Values\\n\\nDare to be bold: We combine diverse talent to look at the familiar in unfamiliar ways.\\n\\nCelebrate perspectives - We combine diverse talent to look at the familiar in unfamiliar ways\\n\\nNever settle: We relentlessly push forward to create the extraordinary in every detail.\\n\\nUphold integrity: We promote accountability and respect to raise the bar for ourselves and the industry.\\n\\nWin as a team: We bring out the best in each other to share collective success.\\n\\nAssociate / Senior Associate Front-End Engineer\\nJob Location:    Commerzone IT Tech Park, Yerwada - Pune.\\n\\nRequired Experience: 1 - 3 Years\\n\\nPosition Description \\n\\nThe Client Engineer works on the frontlines of a game development team to create compelling game experiences for our SG products. You will implement, debug, modify and generally support in-game features, development, and operational tools in a timely manner and actively participate in the design of the games.\\n\\nYou will need to have technical skills to operate independently, and the communication and collaboration skills to be an integral and valued team player. At the Software Engineer level, you will need to have the solid skills, experience, and work ethic to succeed as a software engineer, and the desire to learn from your teammates, all while building games that delight our customers.\\n\\n Principal Duties and Responsibilities: \\n\\n• Implement and maintain client-side code for desktop and mobile games in a thorough and timely manner. • Work on client/server-based applications using a variety of technologies including JavaScript, HTML, CSS etc.\\n\\n• Contribute to the development of new/innovative games and different features in a game.\\n\\nPosition Requirements \\n\\n Education: • Bachelor's Degree in Computer Science, Computer Engineering or equivalent experience\\n\\n Required Experience:   \\n\\n• 2-3 years of software development experience \\n\\n• Strong understanding of JavaScript, its quirks, and workarounds\\n\\n• Experience in Data structures (JavaScript or any programming language)\\n\\n• Basic understanding of web mark-up, including HTML5 and CSS3 • Experience with development tools including IDEs, debuggers, bug tracking required\\n\\n• Proficient understanding of code versioning tools, such as Git, CVS, SVN. • Familiarity with Object Oriented Programming techniques and languages.\\n\\n Preferred Experience: \\n\\n• Knowledge of advanced JavaScript libraries and frameworks such as React, AngularJS, jQuery, NodeJS etc.\\n\\n• Hands on experience on other programming languages such as Java, C++, Python etc\\n\\n• Familiarity with front-end build tools, such as Grunt\\n\\n• Distributed application (client/server) development experience \\n\\n• Game Development experience.\\n\\n• Experience in UI development and animations.\\n\\nEducation: \\n\\n• Bachelor's Degree in Computer Science, Computer Engineering or equivalent experience\n",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-07-30T09:31:26.281642+00:00",
+    "updatedAt": "2026-07-31T06:18:51.814662+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-02T00:00:00.000Z",
+        "status": "applied"
+      },
+      {
+        "at": "2026-07-25T00:00:00.000Z",
+        "status": "l1_interview"
+      },
+      {
+        "at": "2026-07-27T00:00:00.000Z",
+        "status": "rejected"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-07-27T00:00:00.000Z",
+        "id": "i8On8w",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-27T00:00:00.000Z",
+        "id": "uhU6y8",
+        "kind": "status",
+        "message": "Status changed to Rejected"
+      },
+      {
+        "at": "2026-07-25T00:00:00.000Z",
+        "id": "-XIi_6",
+        "kind": "status",
+        "message": "Status changed to L1 Interview"
+      },
+      {
+        "at": "2026-07-30T00:00:00.000Z",
+        "id": "BgpjbX",
+        "kind": "created",
+        "message": "Added Light & Wonder — Front-End Engineer"
+      }
+    ]
+  },
+  {
+    "id": "692eb583-7740-40da-912a-14026dabfe1e",
+    "company": "Infosys",
+    "title": "Angular Developer",
+    "location": "Hinjewadi",
+    "workMode": "onsite",
+    "appliedDate": "2026-07-02T00:00:00+00:00",
+    "status": "on_hold",
+    "source": "Consultancy",
+    "recruiterName": "Sanjay Kumar",
+    "recruiterEmail": "hrsanjay.skylark@gmail.com",
+    "salary": "7-8 LPA",
+    "resumeUsed": "Angular resume",
+    "priority": "medium",
+    "archived": false,
+    "createdAt": "2026-07-30T09:34:17.415823+00:00",
+    "updatedAt": "2026-07-31T06:14:47.721995+00:00",
+    "statusHistory": [
+      {
+        "at": "2026-07-02T00:00:00.000Z",
+        "status": "applied"
+      },
+      {
+        "at": "2026-07-15T00:00:00.000Z",
+        "status": "on_hold"
+      }
+    ],
+    "interviews": [],
+    "activity": [
+      {
+        "at": "2026-07-15T00:00:00.000Z",
+        "id": "tvh2e8",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-15T00:00:00.000Z",
+        "id": "nHB3ya",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-15T00:00:00.000Z",
+        "id": "UD2vAR",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-15T00:00:00.000Z",
+        "id": "VUOYnE",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-15T00:00:00.000Z",
+        "id": "mRRwkx",
+        "kind": "updated",
+        "message": "Updated details"
+      },
+      {
+        "at": "2026-07-15T00:00:00.000Z",
+        "id": "n8oQdC",
+        "kind": "status",
+        "message": "Status changed to On Hold"
+      },
+      {
+        "at": "2026-07-02T00:00:00.000Z",
+        "id": "5EsfP7",
+        "kind": "created",
+        "message": "Added Infosys — Angular Developer"
+      }
+    ]
+  }
+]

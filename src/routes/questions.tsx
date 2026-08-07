@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import {
   Plus,
   Search,
@@ -17,6 +17,7 @@ import {
   Trash2,
   Layers,
   ArrowUpDown,
+  Upload,
 } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -53,6 +54,9 @@ import { QuestionCard } from "@/components/questions/QuestionCard";
 import { QuestionFormModal } from "@/components/questions/QuestionFormModal";
 import { cn, formatNiceDate } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { processSmartJsonImport } from "@/lib/data-importer";
+import { useApplicationsStore } from "@/store/useApplications";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/questions")({
   head: () => ({
@@ -71,6 +75,10 @@ function QuestionsPage() {
   const interviews = useInterviewsStore((s) => s.interviews);
   const standaloneQuestions = useInterviewsStore((s) => s.standaloneQuestions);
   const getAllQuestions = useInterviewsStore((s) => s.getAllQuestions);
+  const importQuestions = useInterviewsStore((s) => s.importQuestions);
+  const importInterviews = useInterviewsStore((s) => s.importInterviews);
+  const importAppsData = useApplicationsStore((s) => s.importData);
+  const importFileRef = useRef<HTMLInputElement>(null);
   const addStandaloneQuestion = useInterviewsStore((s) => s.addStandaloneQuestion);
   const updateQuestion = useInterviewsStore((s) => s.updateQuestion);
 
@@ -278,15 +286,49 @@ function QuestionsPage() {
     hard: "bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-300 border-rose-200/60 dark:border-rose-500/20",
   };
 
+  const handleImportFile = async (file: File) => {
+    try {
+      const text = await file.text();
+      const stats = await processSmartJsonImport(text, {
+        importApplications: async (data) => importAppsData(data),
+        importInterviews: async (data) => importInterviews(data),
+        importQuestions: async (data) => importQuestions(data),
+      });
+      toast.success(`Imported ${stats.questions || stats.interviews || stats.applications} records`);
+    } catch {
+      toast.error("Could not import file — invalid JSON format.");
+    }
+  };
+
   return (
     <>
+      <input
+        ref={importFileRef}
+        type="file"
+        accept="application/json"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void handleImportFile(f);
+          e.target.value = "";
+        }}
+      />
       <PageHeader
         title="Questions Bank"
         description="All technical, practical, scenario, and MCQ interview questions."
         actions={
-          <Button className="gap-2" onClick={() => { setEditingQuestion(null); setFormOpen(true); }}>
-            <Plus className="h-4 w-4" /> Add Question
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => importFileRef.current?.click()}
+              className="gap-1.5"
+            >
+              <Upload className="h-4 w-4" /> Import
+            </Button>
+            <Button className="gap-2" onClick={() => { setEditingQuestion(null); setFormOpen(true); }}>
+              <Plus className="h-4 w-4" /> Add Question
+            </Button>
+          </div>
         }
       />
 

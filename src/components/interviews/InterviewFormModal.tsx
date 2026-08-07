@@ -236,7 +236,7 @@ export function InterviewFormModal({
             </div>
 
             {/* Questions Asked Section - Only shown when adding new interview round */}
-            {/* {!editingInterview && (
+            {!editingInterview && (
               <div className="space-y-3 pt-2 border-t">
                 <Label className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                   Questions Asked in this Round ({questions.length})
@@ -271,7 +271,7 @@ export function InterviewFormModal({
 
                 <InterviewQuestionForm onAddQuestion={handleAddQuestionDraft} />
               </div>
-            )} */}
+            )}
 
             {/* General Notes */}
             <div className="space-y-2 pt-2 border-t">

@@ -27,7 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useInterviewsStore } from "@/store/useInterviews";
+import { useInterviewsStore, getInterviewQuestions } from "@/store/useInterviews";
 import { QuestionCard } from "@/components/questions/QuestionCard";
 import { InterviewFormModal } from "@/components/interviews/InterviewFormModal";
 import { QuestionFormModal } from "@/components/questions/QuestionFormModal";
@@ -80,27 +80,7 @@ function InterviewDetailsPage() {
 
   const displayQuestions = useMemo(() => {
     if (!interview) return [];
-    const direct = interview.questions || [];
-    const directIds = new Set(direct.map((q) => q.id));
-    const directTexts = new Set(direct.map((q) => q.question.trim().toLowerCase()));
-
-    const matchingStandalone = standaloneQuestions.filter(
-      (q) =>
-        q.interviewId === interview.id ||
-        (q.company &&
-          q.company.trim().toLowerCase() === interview.company.trim().toLowerCase()),
-    );
-
-    const result = [...direct];
-    for (const sq of matchingStandalone) {
-      if (
-        !directIds.has(sq.id) &&
-        !directTexts.has(sq.question.trim().toLowerCase())
-      ) {
-        result.push(sq);
-      }
-    }
-    return result;
+    return getInterviewQuestions(interview, standaloneQuestions);
   }, [interview, standaloneQuestions]);
 
   if (!interview) {
@@ -303,7 +283,7 @@ function InterviewDetailsPage() {
                   key={q.id}
                   question={q}
                   onEdit={(item) => setEditingQuestion(item)}
-                  onDelete={(qId) => deleteQuestion(qId)}
+                  onDelete={(qId) => deleteQuestion(qId, interview.id)}
                 />
               ))}
             </div>

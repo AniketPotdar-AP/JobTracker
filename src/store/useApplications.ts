@@ -428,7 +428,9 @@ export const useApplicationsStore = create<State>()((set, get) => {
         fail(error, "Could not clear your data.");
         return;
       }
+      writeLocal(`jat.apps.${userId}`, []);
       set({ applications: [] });
+      useInterviewsStore.getState().clearAll();
     },
 
     importData: async (data) => {

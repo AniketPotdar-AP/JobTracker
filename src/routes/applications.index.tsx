@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import {
   Plus,
   Search,
@@ -10,6 +10,7 @@ import {
   Eye,
   Pencil,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -64,6 +65,8 @@ import { fmtDate } from "@/lib/format";
 import { toast } from "sonner";
 import { KanbanBoard } from "@/components/apps/KanbanBoard";
 import { MultiSelect, type Option } from "@/components/ui/multi-select";
+import { processSmartJsonImport } from "@/lib/data-importer";
+import { useInterviewsStore } from "@/store/useInterviews";
 
 export const Route = createFileRoute("/applications/")({
   head: () => ({
@@ -82,6 +85,10 @@ type SortBy = "applied_desc" | "applied_asc" | "company";
 
 function ApplicationsPage() {
   const apps = useApplicationsStore((s) => s.applications);
+  const importData = useApplicationsStore((s) => s.importData);
+  const importInterviews = useInterviewsStore((s) => s.importInterviews);
+  const importQuestions = useInterviewsStore((s) => s.importQuestions);
+  const importFileRef = useRef<HTMLInputElement>(null);
   const setStatus = useApplicationsStore((s) => s.setStatus);
   const remove = useApplicationsStore((s) => s.remove);
   const duplicate = useApplicationsStore((s) => s.duplicate);
@@ -242,20 +249,54 @@ function ApplicationsPage() {
     setFormOpen(true);
   }
 
+  const handleImportFile = async (file: File) => {
+    try {
+      const text = await file.text();
+      const stats = await processSmartJsonImport(text, {
+        importApplications: async (data) => importData(data),
+        importInterviews: async (data) => importInterviews(data),
+        importQuestions: async (data) => importQuestions(data),
+      });
+      toast.success(`Imported ${stats.applications || stats.interviews || stats.questions} records`);
+    } catch {
+      toast.error("Could not import file — invalid JSON format.");
+    }
+  };
+
   return (
     <>
+      <input
+        ref={importFileRef}
+        type="file"
+        accept="application/json"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void handleImportFile(f);
+          e.target.value = "";
+        }}
+      />
       <PageHeader
         title="Applications"
         description={`${filtered.length} of ${apps.length} shown`}
         actions={
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
-          >
-            <Plus className="h-4 w-4" /> Add application
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => importFileRef.current?.click()}
+              className="gap-1.5"
+            >
+              <Upload className="h-4 w-4" /> Import
+            </Button>
+            <Button
+              onClick={() => {
+                setEditing(null);
+                setFormOpen(true);
+              }}
+            >
+              <Plus className="h-4 w-4" /> Add application
+            </Button>
+          </div>
         }
       />
 
