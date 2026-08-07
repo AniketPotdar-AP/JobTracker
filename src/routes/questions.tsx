@@ -363,16 +363,16 @@ function QuestionsPage() {
           />
         ) : view === "table" ? (
           <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-            <Table>
+            <Table className="min-w-[850px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Question</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Language</TableHead>
-                  <TableHead>Topic</TableHead>
-                  <TableHead>Difficulty</TableHead>
-                  <TableHead className="text-center">Count</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="min-w-[250px]">Question</TableHead>
+                  <TableHead className="min-w-[140px]">Type</TableHead>
+                  <TableHead className="min-w-[110px]">Language</TableHead>
+                  <TableHead className="min-w-[140px]">Topic</TableHead>
+                  <TableHead className="min-w-[110px]">Difficulty</TableHead>
+                  <TableHead className="text-center min-w-[80px]">Count</TableHead>
+                  <TableHead className="text-right min-w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -397,8 +397,11 @@ function QuestionsPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {q.difficulty && <Badge className={difficultyColors[q.difficulty]}>{q.difficulty}</Badge>}
-                    </TableCell>
+                      {q.difficulty && (
+                        <Badge className={`${difficultyColors[q.difficulty]} capitalize`}>
+                          {q.difficulty}
+                        </Badge>
+                      )}                    </TableCell>
                     <TableCell className="text-center"><Badge variant="secondary">{q.askedCount || 1}</Badge></TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">

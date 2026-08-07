@@ -212,10 +212,10 @@ export function InterviewFormModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="locationOrUrl" className="font-semibold text-xs">Meeting Link / Location</Label>
+                <Label htmlFor="locationOrUrl" className="font-semibold text-xs">Interview Recording Link</Label>
                 <Input
                   id="locationOrUrl"
-                  placeholder="e.g. meet.google.com/abc-xyz"
+                  placeholder="e.g. drive.google.com/rec-123 or loom.com/share/..."
                   value={locationOrUrl}
                   onChange={(e) => setLocationOrUrl(e.target.value)}
                 />
@@ -235,41 +235,43 @@ export function InterviewFormModal({
               />
             </div>
 
-            {/* Questions Asked Section */}
-            <div className="space-y-3 pt-2 border-t">
-              <Label className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
-                Questions Asked in this Round ({questions.length})
-              </Label>
+            {/* Questions Asked Section - Only shown when adding new interview round */}
+            {!editingInterview && (
+              <div className="space-y-3 pt-2 border-t">
+                <Label className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                  Questions Asked in this Round ({questions.length})
+                </Label>
 
-              {questions.length > 0 && (
-                <div className="grid gap-2 mb-2">
-                  {questions.map((q, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between p-2.5 rounded-md border bg-muted/30 text-xs"
-                    >
-                      <div className="min-w-0 flex-1 pr-2">
-                        <p className="font-medium truncate">{q.question}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          {q.type} • {q.language} {q.subLanguage ? `(${q.subLanguage})` : ""}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs text-destructive hover:text-destructive shrink-0"
-                        onClick={() => handleRemoveQuestionDraft(idx)}
+                {questions.length > 0 && (
+                  <div className="grid gap-2 mb-2">
+                    {questions.map((q, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-2.5 rounded-md border bg-muted/30 text-xs"
                       >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <div className="min-w-0 flex-1 pr-2">
+                          <p className="font-medium truncate">{q.question}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {q.type} • {q.language} {q.subLanguage ? `(${q.subLanguage})` : ""}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-destructive hover:text-destructive shrink-0"
+                          onClick={() => handleRemoveQuestionDraft(idx)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-              <InterviewQuestionForm onAddQuestion={handleAddQuestionDraft} />
-            </div>
+                <InterviewQuestionForm onAddQuestion={handleAddQuestionDraft} />
+              </div>
+            )}
 
             {/* General Notes */}
             <div className="space-y-2 pt-2 border-t">

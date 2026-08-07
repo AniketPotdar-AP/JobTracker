@@ -56,8 +56,9 @@ export function MobileNav() {
                     "text-[10px] font-medium tracking-wide",
                     active && "font-semibold",
                   )}
+                  title={it.label}
                 >
-                  {it.label}
+                  {it.label.slice(0, 3)}
                 </span>
               </Link>
             </li>

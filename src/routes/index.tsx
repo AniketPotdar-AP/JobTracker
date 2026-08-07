@@ -21,6 +21,7 @@ import {
   IN_PROGRESS_STATUSES,
   STATUS_LABEL,
   STATUS_ORDER,
+  STATUS_COLOR,
   type Status,
 } from "@/lib/status";
 import { fmtDate } from "@/lib/format";
@@ -111,7 +112,7 @@ function DashboardPage() {
     return STATUS_ORDER.map((s) => ({
       name: STATUS_LABEL[s],
       value: apps.filter((a) => a.status === s).length,
-      color: STATUS_COLORS[s] ?? "#94a3b8",
+      color: STATUS_COLOR[s] ?? "#94a3b8",
     })).filter((d) => d.value > 0);
   }, [apps]);
 

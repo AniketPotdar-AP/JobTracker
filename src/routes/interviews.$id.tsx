@@ -228,7 +228,7 @@ function InterviewDetailsPage() {
               {interview.locationOrUrl && (
                 <div className="pt-2">
                   <span className="text-xs text-muted-foreground block mb-1">
-                    Meeting Link
+                    Interview Recording Link
                   </span>
                   <a
                     href={

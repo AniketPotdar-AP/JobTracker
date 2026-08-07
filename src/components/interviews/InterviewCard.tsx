@@ -147,7 +147,7 @@ export function InterviewCard({
               rel="noreferrer"
               className="flex items-center gap-1 text-primary hover:underline"
             >
-              <ExternalLink className="h-3 w-3" /> Meeting Link
+              <ExternalLink className="h-3 w-3" /> Interview Recording Link
             </a>
           )}
         </div>

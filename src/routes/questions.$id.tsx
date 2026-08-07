@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   ArrowLeft,
   Pencil,
@@ -62,11 +62,40 @@ function QuestionDetailsPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
 
+  const interviews = useInterviewsStore((s) => s.interviews);
+  const standaloneQuestions = useInterviewsStore((s) => s.standaloneQuestions);
   const getAllQuestions = useInterviewsStore((s) => s.getAllQuestions);
   const updateQuestion = useInterviewsStore((s) => s.updateQuestion);
   const deleteQuestion = useInterviewsStore((s) => s.deleteQuestion);
 
-  const question = getAllQuestions().find((q) => q.id === id);
+  const question = useMemo(() => {
+    // 1. Direct match in aggregated questions bank
+    const all = getAllQuestions();
+    const foundAll = all.find((q) => q.id === id);
+    if (foundAll) return foundAll;
+
+    // 2. Lookup in standaloneQuestions
+    const directStandalone = standaloneQuestions.find((q) => q.id === id);
+    if (directStandalone) {
+      const match = all.find(
+        (q) => q.question.trim().toLowerCase() === directStandalone.question.trim().toLowerCase(),
+      );
+      return match || directStandalone;
+    }
+
+    // 3. Lookup in interview questions
+    for (const iv of interviews) {
+      const ivQ = iv.questions?.find((q) => q.id === id);
+      if (ivQ) {
+        const match = all.find(
+          (q) => q.question.trim().toLowerCase() === ivQ.question.trim().toLowerCase(),
+        );
+        return match || { ...ivQ, company: ivQ.company || iv.company, roundType: ivQ.roundType || iv.roundType };
+      }
+    }
+
+    return null;
+  }, [id, interviews, standaloneQuestions, getAllQuestions]);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);

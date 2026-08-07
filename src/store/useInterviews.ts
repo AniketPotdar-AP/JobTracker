@@ -30,6 +30,46 @@ const persistStore = (
   }
 };
 
+// Helpers to format domain models into database row objects
+const mapInterviewToRow = (userId: string, iv: InterviewRecord) => ({
+  id: iv.id,
+  user_id: userId,
+  application_id: iv.applicationId || null,
+  company: iv.company,
+  job_title: iv.jobTitle || null,
+  round_type: iv.roundType,
+  interview_date: iv.interviewDate,
+  interviewer_name: iv.interviewerName || null,
+  location_or_url: iv.locationOrUrl || null,
+  notes: iv.notes || null,
+  outcome: iv.outcome || null,
+  questions: (iv.questions || []) as any,
+  created_at: iv.createdAt || now(),
+  updated_at: iv.updatedAt || now(),
+});
+
+const mapQuestionToRow = (userId: string, q: QuestionItem) => ({
+  id: q.id,
+  user_id: userId,
+  interview_id: q.interviewId || null,
+  question: q.question,
+  type: q.type,
+  language: q.language,
+  sub_language: q.subLanguage || null,
+  difficulty: q.difficulty || null,
+  company: q.company || null,
+  job_title: q.jobTitle || null,
+  round_type: q.roundType || null,
+  asked_count: q.askedCount || 1,
+  answer: q.answer || null,
+  code_snippet: q.codeSnippet || null,
+  notes: q.notes || null,
+  options: (q.options || null) as any,
+  correct_option_index: q.correctOptionIndex ?? null,
+  date_added: q.dateAdded || new Date().toISOString().slice(0, 10),
+  updated_at: now(),
+});
+
 type InterviewsState = {
   interviews: InterviewRecord[];
   standaloneQuestions: QuestionItem[];
@@ -60,9 +100,31 @@ type InterviewsState = {
   getAllQuestions: () => QuestionItem[];
 };
 
+const getInitialInterviews = (): InterviewRecord[] => {
+  if (typeof window === "undefined") return [];
+  const keys = Object.keys(localStorage || {});
+  const ivKey = keys.find((k) => k.startsWith("jat.interviews."));
+  if (ivKey) {
+    const data = readLocal<InterviewRecord[]>(ivKey);
+    if (data && Array.isArray(data) && data.length > 0) return data;
+  }
+  return [];
+};
+
+const getInitialQuestions = (): QuestionItem[] => {
+  if (typeof window === "undefined") return [];
+  const keys = Object.keys(localStorage || {});
+  const qKey = keys.find((k) => k.startsWith("jat.questions."));
+  if (qKey) {
+    const data = readLocal<QuestionItem[]>(qKey);
+    if (data && Array.isArray(data) && data.length > 0) return data;
+  }
+  return [];
+};
+
 export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
-  interviews: SEED_INTERVIEWS,
-  standaloneQuestions: SEED_STANDALONE_QUESTIONS,
+  interviews: getInitialInterviews(),
+  standaloneQuestions: getInitialQuestions(),
   userId: null,
 
   loadUser: (userId) => {
@@ -256,13 +318,26 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
       }
     }
 
+
+
     if (changed) {
       persistStore(get().userId, currentInterviews, get().standaloneQuestions);
       set({ interviews: currentInterviews });
+
+      const userId = get().userId;
+      if (userId && userId !== "guest") {
+        for (const iv of currentInterviews) {
+          void supabase
+            .from("interviews")
+            .upsert(mapInterviewToRow(userId, iv))
+            .then(() => {}, () => {});
+        }
+      }
     }
   },
 
   addInterview: (data) => {
+    const userId = get().userId;
     const id = `iv-${nanoid(8)}`;
     const iv: InterviewRecord = {
       ...data,
@@ -272,19 +347,37 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
       updatedAt: now(),
     };
     const next = [iv, ...get().interviews];
-    persistStore(get().userId, next, get().standaloneQuestions);
+    persistStore(userId, next, get().standaloneQuestions);
     set({ interviews: next });
     toast.success("Interview logged successfully");
+
+    if (userId && userId !== "guest") {
+      void supabase
+        .from("interviews")
+        .upsert(mapInterviewToRow(userId, iv))
+        .then(() => {}, (err) => console.error("Error creating interview in DB:", err));
+    }
     return iv;
   },
 
   updateInterview: (id, patch) => {
+    const userId = get().userId;
     const next = get().interviews.map((iv) =>
       iv.id === id ? { ...iv, ...patch, updatedAt: now() } : iv,
     );
-    persistStore(get().userId, next, get().standaloneQuestions);
+    persistStore(userId, next, get().standaloneQuestions);
     set({ interviews: next });
     toast.success("Interview updated");
+
+    if (userId && userId !== "guest") {
+      const updatedIv = next.find((iv) => iv.id === id);
+      if (updatedIv) {
+        void supabase
+          .from("interviews")
+          .upsert(mapInterviewToRow(userId, updatedIv))
+          .then(() => {}, (err) => console.error("Error updating interview in DB:", err));
+      }
+    }
   },
 
   deleteInterview: (id) => {
@@ -301,6 +394,7 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
   },
 
   addQuestionToInterview: (interviewId, qData) => {
+    const userId = get().userId;
     const qId = `q-${nanoid(8)}`;
     const targetIv = get().interviews.find((i) => i.id === interviewId);
     if (!targetIv) return;
@@ -323,48 +417,28 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
 
     const nextStandalone = [newQ, ...get().standaloneQuestions.filter((q) => q.id !== qId)];
 
-    persistStore(get().userId, nextInterviews, nextStandalone);
+    persistStore(userId, nextInterviews, nextStandalone);
     set({ interviews: nextInterviews, standaloneQuestions: nextStandalone });
     toast.success("Question added to interview");
 
-    const userId = get().userId;
     if (userId && userId !== "guest") {
       const updatedIv = nextInterviews.find((i) => i.id === interviewId);
       if (updatedIv) {
         void supabase
           .from("interviews")
-          .update({
-            questions: updatedIv.questions,
-            updated_at: now(),
-          })
-          .eq("id", interviewId)
+          .upsert(mapInterviewToRow(userId, updatedIv))
           .then(() => {}, () => {});
       }
 
-      void supabase.from("questions").upsert({
-        id: newQ.id,
-        user_id: userId,
-        interview_id: newQ.interviewId || null,
-        question: newQ.question,
-        type: newQ.type,
-        language: newQ.language,
-        sub_language: newQ.subLanguage || null,
-        difficulty: newQ.difficulty || null,
-        company: newQ.company || null,
-        job_title: newQ.jobTitle || null,
-        round_type: newQ.roundType || null,
-        asked_count: newQ.askedCount || 1,
-        answer: newQ.answer || null,
-        code_snippet: newQ.codeSnippet || null,
-        notes: newQ.notes || null,
-        options: newQ.options || null,
-        correct_option_index: newQ.correctOptionIndex ?? null,
-        date_added: newQ.dateAdded,
-      }).then(() => {}, () => {});
+      void supabase
+        .from("questions")
+        .upsert(mapQuestionToRow(userId, newQ))
+        .then(() => {}, () => {});
     }
   },
 
   addStandaloneQuestion: (qData) => {
+    const userId = get().userId;
     const id = `q-${nanoid(8)}`;
     const newQ: QuestionItem = {
       ...qData,
@@ -373,6 +447,7 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
     };
 
     let nextInterviews = get().interviews;
+    const affectedIvIds: string[] = [];
     if (newQ.company || newQ.interviewId) {
       nextInterviews = nextInterviews.map((iv) => {
         const matchById = newQ.interviewId && iv.id === newQ.interviewId;
@@ -381,6 +456,7 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
           iv.company.trim().toLowerCase() === newQ.company.trim().toLowerCase();
         if (matchById || matchByComp) {
           if (!iv.questions.some((q) => q.id === newQ.id)) {
+            affectedIvIds.push(iv.id);
             return { ...iv, questions: [newQ, ...iv.questions], updatedAt: now() };
           }
         }
@@ -389,138 +465,79 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
     }
 
     const nextQ = [newQ, ...get().standaloneQuestions];
-    persistStore(get().userId, nextInterviews, nextQ);
+    persistStore(userId, nextInterviews, nextQ);
     set({ interviews: nextInterviews, standaloneQuestions: nextQ });
     toast.success("Question added to bank");
 
-    const userId = get().userId;
     if (userId && userId !== "guest") {
-      void supabase.from("questions").upsert({
-        id: newQ.id,
-        user_id: userId,
-        interview_id: newQ.interviewId || null,
-        question: newQ.question,
-        type: newQ.type,
-        language: newQ.language,
-        sub_language: newQ.subLanguage || null,
-        difficulty: newQ.difficulty || null,
-        company: newQ.company || null,
-        job_title: newQ.jobTitle || null,
-        round_type: newQ.roundType || null,
-        asked_count: newQ.askedCount || 1,
-        answer: newQ.answer || null,
-        code_snippet: newQ.codeSnippet || null,
-        notes: newQ.notes || null,
-        options: newQ.options || null,
-        correct_option_index: newQ.correctOptionIndex ?? null,
-        date_added: newQ.dateAdded,
-      }).then(() => {}, () => {});
+      void supabase
+        .from("questions")
+        .upsert(mapQuestionToRow(userId, newQ))
+        .then(() => {}, () => {});
+
+      for (const ivId of affectedIvIds) {
+        const updatedIv = nextInterviews.find((iv) => iv.id === ivId);
+        if (updatedIv) {
+          void supabase
+            .from("interviews")
+            .upsert(mapInterviewToRow(userId, updatedIv))
+            .then(() => {}, () => {});
+        }
+      }
     }
     return newQ;
   },
 
   updateQuestion: (id, patch) => {
-    let updatedInIv = false;
-    let targetIvId: string | null = null;
-    let updatedQuestion: QuestionItem | null = null;
+    const userId = get().userId;
+    let targetQuestion: QuestionItem | null = null;
+    const affectedIvIds: string[] = [];
 
+    // 1. Update in interviews list if present
     const nextIv = get().interviews.map((iv) => {
       const qIndex = iv.questions.findIndex((q) => q.id === id);
       if (qIndex >= 0) {
-        updatedInIv = true;
-        targetIvId = iv.id;
+        affectedIvIds.push(iv.id);
         const updatedQs = [...iv.questions];
         updatedQs[qIndex] = { ...updatedQs[qIndex], ...patch };
-        updatedQuestion = updatedQs[qIndex];
+        targetQuestion = updatedQs[qIndex];
         return { ...iv, questions: updatedQs, updatedAt: now() };
       }
       return iv;
     });
 
-    const userId = get().userId;
-
-    if (updatedInIv) {
-      persistStore(userId, nextIv, get().standaloneQuestions);
-      set({ interviews: nextIv });
-      toast.success("Question updated");
-
-      if (userId && userId !== "guest" && targetIvId && updatedQuestion) {
-        const targetIv = nextIv.find((iv) => iv.id === targetIvId);
-        if (targetIv) {
-          void supabase
-            .from("interviews")
-            .update({
-              questions: targetIv.questions,
-              updated_at: now(),
-            })
-            .eq("id", targetIvId)
-            .then(() => {}, () => {});
-        }
-        const q: QuestionItem = updatedQuestion;
-        void supabase
-          .from("questions")
-          .upsert({
-            id: q.id,
-            user_id: userId,
-            interview_id: q.interviewId || null,
-            question: q.question,
-            type: q.type,
-            language: q.language,
-            sub_language: q.subLanguage || null,
-            difficulty: q.difficulty || null,
-            company: q.company || null,
-            job_title: q.jobTitle || null,
-            round_type: q.roundType || null,
-            asked_count: q.askedCount || 1,
-            answer: q.answer || null,
-            code_snippet: q.codeSnippet || null,
-            notes: q.notes || null,
-            options: q.options || null,
-            correct_option_index: q.correctOptionIndex ?? null,
-            date_added: q.dateAdded,
-          })
-          .then(() => {}, () => {});
-      }
-      return;
-    }
-
+    // 2. Update in standalone questions list
     const nextQ = get().standaloneQuestions.map((q) => {
       if (q.id === id) {
-        updatedQuestion = { ...q, ...patch };
-        return updatedQuestion;
+        const updated = { ...q, ...patch };
+        if (!targetQuestion) targetQuestion = updated;
+        return updated;
       }
       return q;
     });
 
-    persistStore(userId, get().interviews, nextQ);
-    set({ standaloneQuestions: nextQ });
+    persistStore(userId, nextIv, nextQ);
+    set({ interviews: nextIv, standaloneQuestions: nextQ });
     toast.success("Question updated");
 
-    if (userId && userId !== "guest" && updatedQuestion) {
-      const q: QuestionItem = updatedQuestion;
-      void supabase
-        .from("questions")
-        .upsert({
-          id: q.id,
-          user_id: userId,
-          interview_id: q.interviewId || null,
-          question: q.question,
-          type: q.type,
-          language: q.language,
-          sub_language: q.subLanguage || null,
-          difficulty: q.difficulty || null,
-          company: q.company || null,
-          job_title: q.jobTitle || null,
-          round_type: q.roundType || null,
-          asked_count: q.askedCount || 1,
-          answer: q.answer || null,
-          code_snippet: q.codeSnippet || null,
-          notes: q.notes || null,
-          options: q.options || null,
-          correct_option_index: q.correctOptionIndex ?? null,
-          date_added: q.dateAdded,
-        })
-        .then(() => {}, () => {});
+    // 3. Sync DB if authenticated
+    if (userId && userId !== "guest") {
+      if (targetQuestion) {
+        void supabase
+          .from("questions")
+          .upsert(mapQuestionToRow(userId, targetQuestion))
+          .then(() => {}, (err) => console.error("Error updating question in DB:", err));
+      }
+
+      for (const ivId of affectedIvIds) {
+        const updatedIv = nextIv.find((iv) => iv.id === ivId);
+        if (updatedIv) {
+          void supabase
+            .from("interviews")
+            .upsert(mapInterviewToRow(userId, updatedIv))
+            .then(() => {}, (err) => console.error("Error updating interview questions in DB:", err));
+        }
+      }
     }
   },
 
@@ -533,6 +550,7 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
     const nextIv = get().interviews.map((iv) => ({
       ...iv,
       questions: iv.questions.filter((q) => q.id !== id),
+      updatedAt: iv.questions.some((q) => q.id === id) ? now() : iv.updatedAt,
     }));
 
     const nextQ = get().standaloneQuestions.filter((q) => q.id !== id);
@@ -549,15 +567,13 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
         .then(() => {}, () => {});
 
       if (targetIv) {
-        const updatedQs = targetIv.questions.filter((q) => q.id !== id);
-        void supabase
-          .from("interviews")
-          .update({
-            questions: updatedQs,
-            updated_at: now(),
-          })
-          .eq("id", targetIv.id)
-          .then(() => {}, () => {});
+        const updatedIv = nextIv.find((iv) => iv.id === targetIv.id);
+        if (updatedIv) {
+          void supabase
+            .from("interviews")
+            .upsert(mapInterviewToRow(userId, updatedIv))
+            .then(() => {}, () => {});
+        }
       }
     }
   },

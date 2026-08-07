@@ -168,19 +168,27 @@ function DetailsPage() {
         <div className="lg:col-span-2 space-y-4">
           <Tabs defaultValue="overview">
             <div className="overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-              <TabsList className="w-max min-w-full justify-start">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="timeline" className="hidden sm:inline-flex">
-                  Timeline
+              <TabsList className="w-full justify-start overflow-x-auto">
+                <TabsTrigger value="overview">
+                  <span className="sm:hidden">Ovr</span>
+                  <span className="hidden sm:inline">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger
-                  value="interviews"
-                  className="hidden sm:inline-flex"
-                >
-                  Interviews
+                <TabsTrigger value="timeline">
+                  <span className="sm:hidden">Tml</span>
+                  <span className="hidden sm:inline">Timeline</span>
                 </TabsTrigger>
-                <TabsTrigger value="notes">Notes</TabsTrigger>
-                <TabsTrigger value="history">Status history</TabsTrigger>
+                <TabsTrigger value="interviews">
+                  <span className="sm:hidden">Int</span>
+                  <span className="hidden sm:inline">Interviews</span>
+                </TabsTrigger>
+                <TabsTrigger value="notes">
+                  <span className="sm:hidden">Not</span>
+                  <span className="hidden sm:inline">Notes</span>
+                </TabsTrigger>
+                <TabsTrigger value="history">
+                  <span className="sm:hidden">His</span>
+                  <span className="hidden sm:inline">Status history</span>
+                </TabsTrigger>
               </TabsList>
             </div>
 

@@ -80,6 +80,24 @@ export const STATUS_CLASS: Record<Status, string> = {
     "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300 border-green-200/60 dark:border-green-500/20",
 };
 
+// Hex colors for status distribution charts
+export const STATUS_COLOR: Record<Status, string> = {
+  applied: "#3b82f6",
+  recruiter_call: "#6366f1",
+  screening_round: "#14b8a6", // Teal
+  assessment: "#06b6d4",
+  l1_interview: "#8b5cf6",
+  l2_interview: "#a855f7",
+  l3_interview: "#d946ef",
+  hr_interview: "#ec4899",
+  on_hold: "#f59e0b",
+  rejected: "#ef4444",
+  ghosted: "#94a3b8",
+  position_filled: "#f97316", // Orange
+  offer: "#10b981",
+  joined: "#22c55e",
+};
+
 export const ACTUAL_INTERVIEW_STATUSES: Status[] = [
   "screening_round",
   "assessment",

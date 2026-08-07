@@ -503,14 +503,14 @@ function InterviewsPage() {
         ) : view === "table" ? (
           /* High Visibility Data Table View */
           <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-            <Table>
+            <Table className="min-w-[700px]">
               <TableHeader className="bg-muted/40">
                 <TableRow>
-                  <TableHead className="font-semibold text-foreground">Company & Role</TableHead>
-                  <TableHead className="font-semibold text-foreground">Round Name</TableHead>
-                  <TableHead className="font-semibold text-foreground">Interview Date</TableHead>
-                  <TableHead className="font-semibold text-foreground text-center">Questions</TableHead>
-                  <TableHead className="text-right font-semibold text-foreground">Actions</TableHead>
+                  <TableHead className="font-semibold text-foreground min-w-[180px]">Company & Role</TableHead>
+                  <TableHead className="font-semibold text-foreground min-w-[150px]">Round Name</TableHead>
+                  <TableHead className="font-semibold text-foreground min-w-[130px]">Interview Date</TableHead>
+                  <TableHead className="font-semibold text-foreground text-center min-w-[110px]">Questions</TableHead>
+                  <TableHead className="text-right font-semibold text-foreground min-w-[120px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

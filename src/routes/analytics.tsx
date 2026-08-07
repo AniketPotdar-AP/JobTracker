@@ -7,6 +7,7 @@ import {
   INTERVIEW_STATUSES,
   STATUS_LABEL,
   STATUS_ORDER,
+  STATUS_COLOR,
   type Status,
 } from "@/lib/status";
 import {
@@ -111,7 +112,7 @@ function AnalyticsPage() {
       statusData: STATUS_ORDER.map((s) => ({
         name: STATUS_LABEL[s],
         value: statusCounts.get(s) ?? 0,
-        color: STATUS_COLORS[s] ?? "#94a3b8",
+        color: STATUS_COLOR[s] ?? "#94a3b8",
       })).filter((d) => d.value > 0),
       funnel: { total: apps.length, interviewed, offered },
     };
