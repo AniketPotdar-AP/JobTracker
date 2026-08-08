@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SearchableSelect, type Option } from "@/components/ui/searchable-select";
 import type { InterviewOutcome, InterviewRecord, QuestionItem } from "@/types/interviews";
-import { InterviewQuestionForm } from "./InterviewQuestionForm";
 import { useApplicationsStore } from "@/store/useApplications";
 
 type InterviewFormModalProps = {
@@ -96,21 +95,13 @@ export function InterviewFormModal({
     }
   }, [editingInterview, open]);
 
-  const handleAddQuestionDraft = (q: Omit<QuestionItem, "id" | "dateAdded">) => {
-    setQuestions([...questions, q]);
-  };
-
-  const handleRemoveQuestionDraft = (idx: number) => {
-    setQuestions(questions.filter((_, i) => i !== idx));
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!company.trim()) return;
 
     const finalRoundType = roundType.trim() || "Screening Round";
 
-    const formattedQuestions: QuestionItem[] = questions.map((q, idx) => ({
+    const formattedQuestions: QuestionItem[] = questions.map((q: Omit<QuestionItem, "id" | "dateAdded">, idx: number) => ({
       ...q,
       id: (q as QuestionItem).id || `draft-q-${idx}-${Date.now()}`,
       company: company.trim(),
@@ -235,43 +226,7 @@ export function InterviewFormModal({
               />
             </div>
 
-            {/* Questions Asked Section - Only shown when adding new interview round */}
-            {!editingInterview && (
-              <div className="space-y-3 pt-2 border-t">
-                <Label className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
-                  Questions Asked in this Round ({questions.length})
-                </Label>
 
-                {questions.length > 0 && (
-                  <div className="grid gap-2 mb-2">
-                    {questions.map((q, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between p-2.5 rounded-md border bg-muted/30 text-xs"
-                      >
-                        <div className="min-w-0 flex-1 pr-2">
-                          <p className="font-medium truncate">{q.question}</p>
-                          <p className="text-[10px] text-muted-foreground">
-                            {q.type} • {q.language} {q.subLanguage ? `(${q.subLanguage})` : ""}
-                          </p>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs text-destructive hover:text-destructive shrink-0"
-                          onClick={() => handleRemoveQuestionDraft(idx)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <InterviewQuestionForm onAddQuestion={handleAddQuestionDraft} />
-              </div>
-            )}
 
             {/* General Notes */}
             <div className="space-y-2 pt-2 border-t">

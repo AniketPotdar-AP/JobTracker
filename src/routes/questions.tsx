@@ -314,7 +314,14 @@ function QuestionsPage() {
         }}
       />
       <PageHeader
-        title="Questions Bank"
+        title={
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span>Questions Bank</span>
+            <Badge variant="secondary" className="text-xs font-semibold px-2.5 py-0.5 bg-primary/10 text-primary border-primary/20">
+              {questions.length} Total {questions.length === 1 ? "Question" : "Questions"}
+            </Badge>
+          </div>
+        }
         description="All technical, practical, scenario, and MCQ interview questions."
         actions={
           <div className="flex items-center gap-2">
@@ -373,6 +380,12 @@ function QuestionsPage() {
             {activeFiltersCount > 0 && <Badge variant="default" className="ml-1 px-1.5 h-5">{activeFiltersCount}</Badge>}
           </Button>
         </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+        <span>
+          Showing <strong className="text-foreground">{sortedQuestions.length}</strong> of <strong className="text-foreground">{questions.length}</strong> total questions
+        </span>
       </div>
 
       <div className="mt-6">

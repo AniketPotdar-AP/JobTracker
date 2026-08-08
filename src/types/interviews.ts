@@ -35,6 +35,7 @@ export type InterviewOutcome = "pending" | "passed" | "failed" | "completed";
 
 export type InterviewRecord = {
   id: string;
+  aliasIds?: string[];
   applicationId?: string;
   company: string;
   jobTitle?: string;
@@ -93,6 +94,9 @@ export const PRESET_LANGUAGES = [
   "MongoDB",
   "PostgreSQL",
   "Docker",
+  "AWS",
+  "Azure",
+  "GCP",
   "System Design",
 ];
 

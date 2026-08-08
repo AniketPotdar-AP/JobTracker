@@ -166,6 +166,7 @@ export const RESUME_SUGGESTIONS = [
   "Angular resume",
   "React resume",
   "Fullstack resume",
+  "Service now resume",
 ];
 
 /** Quick-pick position names offered in the application form (free text still allowed). */
@@ -175,4 +176,5 @@ export const POSITION_SUGGESTIONS = [
   "React Developer",
   "Full Stack Developer",
   "Node.js Developer",
+  "Service now Developer",
 ];

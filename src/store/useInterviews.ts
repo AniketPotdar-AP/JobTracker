@@ -13,15 +13,26 @@ const now = () => new Date().toISOString();
 const SEED_INTERVIEWS: InterviewRecord[] = [];
 const SEED_STANDALONE_QUESTIONS: QuestionItem[] = [];
 
+const getInitialDeletedInterviews = (): string[] => {
+  if (typeof window === "undefined") return [];
+  const data = readLocal<string[]>("jat.deleted_interviews");
+  if (data && Array.isArray(data)) return data;
+  return [];
+};
+
 // Helper to reliably save interviews & standalone questions to localStorage
 const persistStore = (
   userId: string | null,
   interviews: InterviewRecord[],
   standaloneQuestions: QuestionItem[],
+  deletedIds?: string[],
 ) => {
   const keyUser = userId || "guest";
   writeLocal(`jat.interviews.${keyUser}`, interviews);
   writeLocal(`jat.questions.${keyUser}`, standaloneQuestions);
+  if (deletedIds) {
+    writeLocal("jat.deleted_interviews", deletedIds);
+  }
 
   // Also write to guest key as fallback if userId is set
   if (userId && userId !== "guest") {
@@ -73,6 +84,7 @@ const mapQuestionToRow = (userId: string, q: QuestionItem) => ({
 type InterviewsState = {
   interviews: InterviewRecord[];
   standaloneQuestions: QuestionItem[];
+  deletedInterviewIds: string[];
   userId: string | null;
 
   loadUser: (userId: string) => void;
@@ -89,6 +101,11 @@ type InterviewsState = {
   addQuestionToInterview: (
     interviewId: string,
     question: Omit<QuestionItem, "id" | "dateAdded">,
+  ) => void;
+  reorderInterviewQuestions: (
+    interviewId: string,
+    startIndex: number,
+    endIndex: number,
   ) => void;
 
   addStandaloneQuestion: (
@@ -190,7 +207,16 @@ export function dedupeInterviews(records: InterviewRecord[]): InterviewRecord[] 
     if (seenIds.has(rawIv.id)) continue;
 
     const cleanQuestions = filterQuestionsForInterview(rawIv.questions || [], rawIv);
-    const iv = { ...rawIv, questions: cleanQuestions };
+    let cleanLocation = rawIv.locationOrUrl;
+    if (
+      cleanLocation &&
+      (cleanLocation.includes("\n") ||
+        cleanLocation.length > 200 ||
+        (rawIv.notes && cleanLocation === rawIv.notes))
+    ) {
+      cleanLocation = undefined;
+    }
+    const iv = { ...rawIv, locationOrUrl: cleanLocation, questions: cleanQuestions };
 
     const normCompany = (iv.company || "").trim().toLowerCase();
     const normRound = (iv.roundType || "").trim().toLowerCase();
@@ -226,12 +252,32 @@ export function dedupeInterviews(records: InterviewRecord[]): InterviewRecord[] 
       for (const q of mergedQuestions) {
         if (!uniqueQMap.has(q.id)) uniqueQMap.set(q.id, q);
       }
+      let finalLocation = existing.locationOrUrl || iv.locationOrUrl;
+      if (
+        finalLocation &&
+        (finalLocation.includes("\n") ||
+          finalLocation.length > 200 ||
+          (existing.notes && finalLocation === existing.notes))
+      ) {
+        finalLocation = undefined;
+      }
+
+      const combinedAliasIds = Array.from(
+        new Set([
+          ...(existing.aliasIds || [existing.id]),
+          ...(iv.aliasIds || [iv.id]),
+          existing.id,
+          iv.id,
+        ]),
+      );
+
       result[existingIndex] = {
         ...existing,
+        aliasIds: combinedAliasIds,
         applicationId: existing.applicationId || iv.applicationId,
         jobTitle: existing.jobTitle || iv.jobTitle,
         interviewerName: existing.interviewerName || iv.interviewerName,
-        locationOrUrl: existing.locationOrUrl || iv.locationOrUrl,
+        locationOrUrl: finalLocation,
         notes: existing.notes || iv.notes,
         outcome: existing.outcome || iv.outcome,
         questions: Array.from(uniqueQMap.values()),
@@ -271,6 +317,7 @@ const getInitialQuestions = (): QuestionItem[] => {
 export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
   interviews: getInitialInterviews(),
   standaloneQuestions: getInitialQuestions(),
+  deletedInterviewIds: getInitialDeletedInterviews(),
   userId: null,
 
   loadUser: (userId) => {
@@ -281,18 +328,14 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
     const cachedQ = readLocal<QuestionItem[]>(qKey);
 
     const initialDeduped =
-      cachedIv && Array.isArray(cachedIv)
+      cachedIv && Array.isArray(cachedIv) && cachedIv.length > 0
         ? dedupeInterviews(cachedIv)
-        : keyUser === "guest"
-        ? SEED_INTERVIEWS
-        : [];
+        : getInitialInterviews();
 
     const initialQuestions =
-      cachedQ && Array.isArray(cachedQ)
+      cachedQ && Array.isArray(cachedQ) && cachedQ.length > 0
         ? cachedQ
-        : keyUser === "guest"
-        ? SEED_STANDALONE_QUESTIONS
-        : [];
+        : getInitialQuestions();
 
     set({
       userId: keyUser,
@@ -332,25 +375,9 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
               updatedAt: r.updated_at,
             }));
 
-            const dbIv = dedupeInterviews(rawDbIv);
-
-            // Clean up duplicate rows in Supabase DB if raw data contained duplicates
-            if (rawDbIv.length > dbIv.length) {
-              const keepIds = new Set(dbIv.map((iv) => iv.id));
-              const duplicateIdsToDelete = rawDbIv
-                .filter((r) => !keepIds.has(r.id))
-                .map((r) => r.id);
-
-              if (duplicateIdsToDelete.length > 0) {
-                void supabase
-                  .from("interviews" as never)
-                  .delete()
-                  .in("id", duplicateIdsToDelete);
-              }
-            }
-
-            set({ interviews: dbIv });
-            persistStore(userId, dbIv, get().standaloneQuestions);
+            const mergedIv = dedupeInterviews([...get().interviews, ...rawDbIv]);
+            set({ interviews: mergedIv });
+            persistStore(userId, mergedIv, get().standaloneQuestions, get().deletedInterviewIds);
           }
 
           if (!qRes.error && qRes.data) {
@@ -417,6 +444,7 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
     let currentInterviews = dedupeInterviews([...get().interviews]);
     let changed = false;
     const newOrUpdatedIv: InterviewRecord[] = [];
+    const deletedSet = new Set(get().deletedInterviewIds || []);
 
     for (const app of apps) {
       const historyEntries = (app.statusHistory || []).filter(
@@ -445,12 +473,17 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
         const cleanAppId = (app.id || "").replace(/[^a-z0-9_-]/gi, "");
         const deterministicId = `iv-app_${cleanAppId}_${cleanRoundKey}`;
 
+        // Do not resurrect deleted interviews!
+        if (deletedSet.has(deterministicId)) continue;
+
         const existing = currentInterviews.find(
           (iv) =>
             iv.id === deterministicId ||
             (iv.applicationId && iv.applicationId === app.id && isRoundTypeMatch(iv.roundType, normRound)) ||
             ((iv.company || "").trim().toLowerCase() === normCompany && isRoundTypeMatch(iv.roundType, normRound)),
         );
+
+        if (existing && deletedSet.has(existing.id)) continue;
 
         if (!existing) {
           const newIv: InterviewRecord = {
@@ -461,14 +494,14 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
             roundType: roundLabel,
             interviewDate: dateVal.slice(0, 10),
             interviewerName: app.recruiterName,
-            locationOrUrl: app.notes,
+            locationOrUrl: undefined,
             outcome:
               app.status === "rejected"
                 ? "failed"
                 : app.status === "offer" || app.status === "joined"
                   ? "passed"
                   : "completed",
-            notes: app.notes,
+            notes: undefined,
             questions: [],
             createdAt: now(),
             updatedAt: now(),
@@ -508,7 +541,7 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
     currentInterviews = deduped;
 
     if (changed) {
-      persistStore(get().userId, currentInterviews, get().standaloneQuestions);
+      persistStore(get().userId, currentInterviews, get().standaloneQuestions, get().deletedInterviewIds);
       set({ interviews: currentInterviews });
 
       const userId = get().userId;
@@ -586,8 +619,10 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
   deleteInterview: (id) => {
     const userId = get().userId;
     const next = get().interviews.filter((iv) => iv.id !== id);
-    persistStore(userId, next, get().standaloneQuestions);
-    set({ interviews: next });
+    const nextDeletedIds = Array.from(new Set([...(get().deletedInterviewIds || []), id]));
+
+    persistStore(userId, next, get().standaloneQuestions, nextDeletedIds);
+    set({ interviews: next, deletedInterviewIds: nextDeletedIds });
     toast.success("Interview deleted");
 
     if (userId && userId !== "guest") {
@@ -637,6 +672,46 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
         .from("questions" as never)
         .upsert(mapQuestionToRow(userId, newQ) as never)
         .then(() => {}, () => {});
+    }
+  },
+
+  reorderInterviewQuestions: (interviewId, startIndex, endIndex) => {
+    const userId = get().userId;
+    const targetIv = get().interviews.find((i) => i.id === interviewId);
+    if (!targetIv) return;
+
+    const currentQuestions = getInterviewQuestions(targetIv, get().standaloneQuestions);
+    if (
+      startIndex < 0 ||
+      startIndex >= currentQuestions.length ||
+      endIndex < 0 ||
+      endIndex >= currentQuestions.length ||
+      startIndex === endIndex
+    ) {
+      return;
+    }
+
+    const updatedQuestions = [...currentQuestions];
+    const [moved] = updatedQuestions.splice(startIndex, 1);
+    updatedQuestions.splice(endIndex, 0, moved);
+
+    const nextInterviews = get().interviews.map((iv) =>
+      iv.id === interviewId
+        ? { ...iv, questions: updatedQuestions, updatedAt: now() }
+        : iv,
+    );
+
+    persistStore(userId, nextInterviews, get().standaloneQuestions);
+    set({ interviews: nextInterviews });
+
+    if (userId && userId !== "guest") {
+      const updatedIv = nextInterviews.find((i) => i.id === interviewId);
+      if (updatedIv) {
+        void supabase
+          .from("interviews" as never)
+          .upsert(mapInterviewToRow(userId, updatedIv) as never)
+          .then(() => {}, () => {});
+      }
     }
   },
 
@@ -697,24 +772,47 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
   updateQuestion: (id, patch) => {
     const userId = get().userId;
     let targetQuestion: QuestionItem | null = null;
+    let oldQuestionText = "";
+
+    for (const iv of get().interviews) {
+      const q = iv.questions.find((item) => item.id === id);
+      if (q) {
+        oldQuestionText = q.question.trim().toLowerCase();
+        break;
+      }
+    }
+    if (!oldQuestionText) {
+      const sq = get().standaloneQuestions.find((item) => item.id === id);
+      if (sq) oldQuestionText = sq.question.trim().toLowerCase();
+    }
+
     const affectedIvIds: string[] = [];
 
-    // 1. Update in interviews list if present
     const nextIv = get().interviews.map((iv) => {
-      const qIndex = iv.questions.findIndex((q) => q.id === id);
-      if (qIndex >= 0) {
+      let updated = false;
+      const updatedQs = iv.questions.map((q) => {
+        const isMatch =
+          q.id === id || (oldQuestionText && q.question.trim().toLowerCase() === oldQuestionText);
+        if (isMatch) {
+          updated = true;
+          const patched = { ...q, ...patch };
+          if (!targetQuestion) targetQuestion = patched;
+          return patched;
+        }
+        return q;
+      });
+
+      if (updated) {
         affectedIvIds.push(iv.id);
-        const updatedQs = [...iv.questions];
-        updatedQs[qIndex] = { ...updatedQs[qIndex], ...patch };
-        targetQuestion = updatedQs[qIndex];
         return { ...iv, questions: updatedQs, updatedAt: now() };
       }
       return iv;
     });
 
-    // 2. Update in standalone questions list
     const nextQ = get().standaloneQuestions.map((q) => {
-      if (q.id === id) {
+      const isMatch =
+        q.id === id || (oldQuestionText && q.question.trim().toLowerCase() === oldQuestionText);
+      if (isMatch) {
         const updated = { ...q, ...patch };
         if (!targetQuestion) targetQuestion = updated;
         return updated;
@@ -722,11 +820,10 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
       return q;
     });
 
-    persistStore(userId, nextIv, nextQ);
+    persistStore(userId, nextIv, nextQ, get().deletedInterviewIds);
     set({ interviews: nextIv, standaloneQuestions: nextQ });
     toast.success("Question updated");
 
-    // 3. Sync DB if authenticated
     if (userId && userId !== "guest") {
       if (targetQuestion) {
         void supabase
@@ -749,28 +846,57 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
 
   deleteQuestion: (id, targetInterviewId) => {
     const userId = get().userId;
-    const targetIv = get().interviews.find((iv) =>
-      targetInterviewId
-        ? iv.id === targetInterviewId
-        : iv.questions.some((q) => q.id === id),
-    );
+    let questionTextToDelete = "";
+
+    for (const iv of get().interviews) {
+      const q = iv.questions.find((item) => item.id === id);
+      if (q) {
+        questionTextToDelete = q.question.trim().toLowerCase();
+        break;
+      }
+    }
+    if (!questionTextToDelete) {
+      const sq = get().standaloneQuestions.find((item) => item.id === id);
+      if (sq) questionTextToDelete = sq.question.trim().toLowerCase();
+    }
+
+    const affectedIvIds: string[] = [];
 
     const nextIv = get().interviews.map((iv) => {
-      const isTarget = targetInterviewId
-        ? iv.id === targetInterviewId
-        : iv.questions.some((q) => q.id === id);
-      if (!isTarget) return iv;
-      return {
-        ...iv,
-        questions: iv.questions.filter((q) => q.id !== id),
-        updatedAt: now(),
-      };
+      const shouldFilter = targetInterviewId ? iv.id === targetInterviewId : true;
+      if (!shouldFilter) return iv;
+
+      let changed = false;
+      const filteredQuestions = iv.questions.filter((q) => {
+        if (q.id === id) {
+          changed = true;
+          return false;
+        }
+        if (questionTextToDelete && q.question.trim().toLowerCase() === questionTextToDelete) {
+          changed = true;
+          return false;
+        }
+        return true;
+      });
+
+      if (changed) {
+        affectedIvIds.push(iv.id);
+        return {
+          ...iv,
+          questions: filteredQuestions,
+          updatedAt: now(),
+        };
+      }
+      return iv;
     });
 
-    // Also remove from standaloneQuestions if it's completely deleted or matches
-    const nextQ = get().standaloneQuestions.filter((q) => q.id !== id);
+    const nextQ = get().standaloneQuestions.filter((q) => {
+      if (q.id === id) return false;
+      if (questionTextToDelete && q.question.trim().toLowerCase() === questionTextToDelete) return false;
+      return true;
+    });
 
-    persistStore(userId, nextIv, nextQ);
+    persistStore(userId, nextIv, nextQ, get().deletedInterviewIds);
     set({ interviews: nextIv, standaloneQuestions: nextQ });
     toast.success("Question removed");
 
@@ -781,8 +907,8 @@ export const useInterviewsStore = create<InterviewsState>()((set, get) => ({
         .eq("id", id)
         .then(() => {}, () => {});
 
-      if (targetIv) {
-        const updatedIv = nextIv.find((iv) => iv.id === targetIv.id);
+      for (const ivId of affectedIvIds) {
+        const updatedIv = nextIv.find((iv) => iv.id === ivId);
         if (updatedIv) {
           void supabase
             .from("interviews" as never)

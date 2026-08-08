@@ -13,7 +13,22 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
+  GripVertical,
 } from "lucide-react";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,11 +43,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useInterviewsStore, getInterviewQuestions } from "@/store/useInterviews";
+import { useApplicationsStore } from "@/store/useApplications";
 import { QuestionCard } from "@/components/questions/QuestionCard";
 import { InterviewFormModal } from "@/components/interviews/InterviewFormModal";
 import { QuestionFormModal } from "@/components/questions/QuestionFormModal";
 import type { QuestionItem } from "@/types/interviews";
-import { formatNiceDate } from "@/lib/utils";
+import { cn, formatNiceDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/interviews/$id")({
   head: () => ({
@@ -58,12 +74,84 @@ export const Route = createFileRoute("/interviews/$id")({
   ),
 });
 
+function SortableQuestionCard({
+  question,
+  index,
+  onEdit,
+  onDelete,
+}: {
+  question: QuestionItem;
+  index: number;
+  onEdit: (item: QuestionItem) => void;
+  onDelete: (id: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: question.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "flex gap-2 sm:gap-3 items-start group/qitem transition-shadow",
+        isDragging && "opacity-60 shadow-lg rounded-lg border border-primary/40 bg-accent/40"
+      )}
+    >
+      <div className="flex flex-col items-center gap-1.5 pt-3 shrink-0">
+        <Badge
+          variant="outline"
+          className="text-[11px] font-mono font-bold text-muted-foreground px-1.5 py-0.5"
+        >
+          #{index + 1}
+        </Badge>
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing hover:bg-muted transition-colors border border-transparent hover:border-border"
+          title="Drag to reorder question position"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="flex-1 min-w-0">
+        <QuestionCard
+          question={question}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      </div>
+    </div>
+  );
+}
+
 function InterviewDetailsPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
 
+  const appsLoading = useApplicationsStore((s) => s.loading);
   const interview = useInterviewsStore((s) =>
-    s.interviews.find((i) => i.id === id),
+    s.interviews.find(
+      (i) =>
+        i.id === id ||
+        (i.aliasIds && i.aliasIds.includes(id)) ||
+        decodeURIComponent(i.id) === decodeURIComponent(id) ||
+        (i.aliasIds && i.aliasIds.some((a) => decodeURIComponent(a) === decodeURIComponent(id))) ||
+        i.id.toLowerCase() === id.toLowerCase() ||
+        (i.applicationId && i.applicationId === id),
+    ),
   );
   const standaloneQuestions = useInterviewsStore((s) => s.standaloneQuestions);
   const updateInterview = useInterviewsStore((s) => s.updateInterview);
@@ -71,6 +159,7 @@ function InterviewDetailsPage() {
   const addQuestionToInterview = useInterviewsStore((s) => s.addQuestionToInterview);
   const updateQuestion = useInterviewsStore((s) => s.updateQuestion);
   const deleteQuestion = useInterviewsStore((s) => s.deleteQuestion);
+  const reorderInterviewQuestions = useInterviewsStore((s) => s.reorderInterviewQuestions);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -83,16 +172,47 @@ function InterviewDetailsPage() {
     return getInterviewQuestions(interview, standaloneQuestions);
   }, [interview, standaloneQuestions]);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 4,
+      },
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !interview) return;
+
+    const oldIndex = displayQuestions.findIndex((q) => q.id === active.id);
+    const newIndex = displayQuestions.findIndex((q) => q.id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      reorderInterviewQuestions(interview.id, oldIndex, newIndex);
+    }
+  };
+
   if (!interview) {
+    if (appsLoading) {
+      return (
+        <div className="py-16 flex flex-col items-center justify-center gap-3 text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm font-medium text-muted-foreground">Loading interview details...</p>
+        </div>
+      );
+    }
+
     return (
       <div className="py-16 text-center">
         <h2 className="text-lg font-semibold">Interview not found</h2>
-        <Link
-          to="/interviews"
-          className="mt-3 inline-block text-sm text-primary hover:underline"
-        >
-          Back to interviews
-        </Link>
+        <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
+          The requested interview round could not be found or may have been removed.
+        </p>
+        <Button variant="outline" size="sm" asChild className="mt-4">
+          <Link to="/interviews">
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back to interviews
+          </Link>
+        </Button>
       </div>
     );
   }
@@ -277,16 +397,28 @@ function InterviewDetailsPage() {
               </Button>
             </Card>
           ) : (
-            <div className="grid gap-4">
-              {displayQuestions.map((q) => (
-                <QuestionCard
-                  key={q.id}
-                  question={q}
-                  onEdit={(item) => setEditingQuestion(item)}
-                  onDelete={(qId) => deleteQuestion(qId, interview.id)}
-                />
-              ))}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={displayQuestions.map((q) => q.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="grid gap-4">
+                  {displayQuestions.map((q, idx) => (
+                    <SortableQuestionCard
+                      key={q.id}
+                      question={q}
+                      index={idx}
+                      onEdit={(item) => setEditingQuestion(item)}
+                      onDelete={(qId) => deleteQuestion(qId, interview.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
       </div>

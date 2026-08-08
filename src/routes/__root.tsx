@@ -86,6 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function AppShell() {
   const user = useAuthStore((s) => s.user);
+  const hydrated = useAuthStore((s) => s.hydrated);
   const userId = user?.id;
   const loadedUserId = useRef<string | null>(null);
 
@@ -120,8 +121,10 @@ function AppShell() {
     };
   }, []);
 
-  // Load / unload the signed-in user's cloud data — only when userId genuinely changes.
+  // Load / unload the signed-in user's cloud data — only when auth has hydrated and userId genuinely changes.
   useEffect(() => {
+    if (!hydrated) return; // Wait for session hydration before taking load/unload actions!
+
     if (userId) {
       if (loadedUserId.current === userId) return; // already loaded for this user
       loadedUserId.current = userId;
@@ -132,7 +135,18 @@ function AppShell() {
       useApplicationsStore.getState().unloadUser();
       useInterviewsStore.getState().unloadUser();
     }
-  }, [userId]);
+  }, [userId, hydrated]);
+
+  if (!hydrated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-xs text-muted-foreground font-medium">Loading JobTrack...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
